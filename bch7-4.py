@@ -29,7 +29,7 @@ def poly_to_array(poly):
 
 
 # Data and generator polynomial
-data = np.array((1, 0, 0, 1), dtype=int)  # Binary data
+data = np.array((1, 0, 0, 0), dtype=int)  # Binary data
 generator_polynomial = np.array((1, 1, 0, 1), dtype=int)  # Generator polynomial
 
 # Convert to polynomials
@@ -45,7 +45,7 @@ print(f"Generator polynomial: {generator_polynomial_poly}")
 multiplied_data = shift_up(data, np.count_nonzero(generator_polynomial))
 print(f"Multiplied data: {multiplied_data}")
 
-# Perform polynomial division, quotient and remainder
+# Perform polynomial division, get remainder
 remainder = nppoly.polydiv(multiplied_data, generator_polynomial)[1]
 remainder = float_to_int(poly_to_array(remainder))  # Reduce remainder to binary (mod 2)
 print(f"Remainder: {remainder}")
