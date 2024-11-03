@@ -1,56 +1,44 @@
-import numpy.polynomial.polynomial as nppoly
-import numpy as np
+import galois
 
 
-def float_to_int(arr):
-    int_arr = []
-    for i in range(len(arr)):
-        int_arr.append(int(arr[i]) % 2)  # Reduce to binary (mod 2)
-    return int_arr
+def encode_bch(input_data, gen_poly):
+    gf2 = galois.GF(2)
+    data_polynomial = galois.Poly(input_data, field=gf2)
+    generator_polynomial = galois.Poly(gen_poly, field=gf2)
+
+    degree = generator_polynomial.degree
+    shifted_data = data_polynomial * galois.Poly([1] + [0] * degree, field=gf2)
+
+    parity_poly = shifted_data % generator_polynomial
+
+    codeword_poly = shifted_data + parity_poly
+    return generator_polynomial.coeffs, parity_poly.coeffs, codeword_poly.coeffs
 
 
-def shift_up(px, n=1):
-    for i in range(n):
-        px = nppoly.polymulx(px)
-    return float_to_int(px)
+# ============================
+
+def true_encode_bch(input_data):
+    bch_code = galois.BCH(n=7, k=4, field=galois.GF(2))
+    true_gen_poly = bch_code.generator_poly.coeffs
+    true_parity_poly = bch_code.encode(input_data, output="parity")
+    true_codeword_poly = bch_code.encode(input_data, output="codeword")
+    return true_gen_poly, true_parity_poly, true_codeword_poly
 
 
-def shift_down(px, n=1):
-    if n >= len(px):
-        raise ValueError(f"The polynomial cannot be divided by x {n} times (degree is too low).")
-    return np.array(px[n:])
+# ============================
+data_bits = [1, 0, 0, 1]
+gen_poly_bits = [1, 0, 1, 1]
 
+gen_poly, parity_bits, codeword_bits = encode_bch(data_bits, gen_poly_bits)
+print(f"Generator: {gen_poly}")
+print(f"Parity: {parity_bits}")
+print(f"Codeword: {codeword_bits}")
 
-def poly_to_array(poly):
-    result = []
-    for coefficient in poly:
-        result.append(coefficient)
-    return result
+true_gen_poly, true_parity_bits, true_codeword_bits = true_encode_bch(data_bits)
+print(f"True generator: {true_gen_poly}")
+print(f"True parity: {true_parity_bits}")
+print(f"True codeword: {true_codeword_bits}")
 
-
-# Data and generator polynomial
-data = np.array((1, 0, 0, 0), dtype=int)  # Binary data
-generator_polynomial = np.array((1, 1, 0, 1), dtype=int)  # Generator polynomial
-
-# Convert to polynomials
-print(f"Data: {data}")
-data_poly = nppoly.Polynomial(data)
-print(f"Data polynomial: {data_poly}")
-
-print(f"Generator: {generator_polynomial}")
-generator_polynomial_poly = nppoly.Polynomial(generator_polynomial)
-print(f"Generator polynomial: {generator_polynomial_poly}")
-
-# Shift the data polynomial up by the degree of the generator polynomial
-multiplied_data = shift_up(data, np.count_nonzero(generator_polynomial))
-print(f"Multiplied data: {multiplied_data}")
-
-# Perform polynomial division, get remainder
-remainder = nppoly.polydiv(multiplied_data, generator_polynomial)[1]
-remainder = float_to_int(poly_to_array(remainder))  # Reduce remainder to binary (mod 2)
-print(f"Remainder: {remainder}")
-
-# Generate the codeword by adding the remainder back to the multiplied data
-codeword = nppoly.polyadd(multiplied_data, remainder)
-codeword = float_to_int(poly_to_array(codeword))  # Reduce codeword to binary (mod 2)
-print(f"Codeword: {codeword}")
+assert gen_poly.all() == true_gen_poly.all()
+assert parity_bits.all() == true_parity_bits.all()
+assert codeword_bits.all() == true_codeword_bits.all()
