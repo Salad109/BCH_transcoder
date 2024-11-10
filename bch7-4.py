@@ -57,13 +57,17 @@ def decode_bch(codeword, generator, field, t=1):
             # Correction: add the syndrome to the current vector
             corrected_codeword = (codeword_poly + syndrome_poly).coeffs
             # Restore the original position only if there was a shift
+            # Ensure corrected_codeword has the same length as codeword
+            if len(corrected_codeword) < len(codeword):
+                # Add zeros to the start of corrected_codeword
+                corrected_codeword = np.pad(corrected_codeword, (len(codeword) - len(corrected_codeword), 0), 'constant', constant_values=0)
             if i > 0:
                 corrected_codeword = np.roll(corrected_codeword, -i)
             print(f"Corrected codeword: {corrected_codeword}")
             return corrected_codeword, hamming_weight  # Return the corrected code and the number of errors
 
         # Cyclic shift to the right
-        codeword_poly = galois.Poly(np.roll(codeword, i + 1), field=field)
+        codeword_poly = galois.Poly(np.roll(codeword, i+1), field=field)
         print(f"Codeword after {i + 1}-th shift: {codeword_poly.coeffs}")
 
     # If correction is not possible
