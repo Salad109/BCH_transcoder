@@ -17,7 +17,7 @@ def encode_bch(data, generator, field):
 
 
 def true_encode_bch(data, field):
-    bch_code = galois.BCH(n=7, k=4, field=field)
+    bch_code = galois.BCH(n=15, k=7, field=field)
     generator_poly = bch_code.generator_poly.coeffs
     parity_poly = bch_code.encode(data, output="parity")
     codeword_poly = bch_code.encode(data, output="codeword")
@@ -62,7 +62,8 @@ def decode_bch(codeword, generator, field, t=1):
             # Ensure corrected_codeword has the same length as codeword
             if len(corrected_codeword) < len(codeword):
                 # Add zeros to the start of corrected_codeword
-                corrected_codeword = np.pad(corrected_codeword, (len(codeword) - len(corrected_codeword), 0), 'constant', constant_values=0)
+                corrected_codeword = np.pad(corrected_codeword, (len(codeword) - len(corrected_codeword), 0),
+                                            'constant', constant_values=0)
             if i > 0:
                 corrected_codeword = np.roll(corrected_codeword, -i)
             print(f"Corrected codeword: {corrected_codeword}")
@@ -78,15 +79,15 @@ def decode_bch(codeword, generator, field, t=1):
 
 
 def true_decode_bch(input_data, field):
-    bch_code = galois.BCH(n=7, k=4, field=field)
+    bch_code = galois.BCH(n=15, k=7, field=field)
     decoded_codeword, errors = bch_code.decode(input_data, output="codeword", errors=True)
     return decoded_codeword, errors
 
 
 # ============================
-data = [1, 0, 0, 1]
-generator = [1, 0, 1, 1]
-error_count = 1
+data = [1, 0, 1, 0, 1, 0, 1]
+generator = [1, 1, 1, 0, 1, 0, 0, 0, 1]
+error_count = 1 # TODO breaks at 2
 field = galois.GF(2)
 
 generator_bits, parity_bits, codeword_bits = encode_bch(data, generator, field)
