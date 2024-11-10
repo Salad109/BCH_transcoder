@@ -1,5 +1,6 @@
 import random
 import galois
+import numpy as np
 
 
 def encode_bch(data, generator, field):
@@ -34,14 +35,40 @@ def flip_bits(input_data, error_count=1):
 
     return input_data
 
-
-def decode_bch(codeword, generator, field):
+def decode_bch(codeword, generator, field, t=1):
     codeword_poly = galois.Poly(codeword, field=field)
-    roots = galois.Poly.Roots(generator, field=field)
-    print(f"Roots of {generator}: {roots.coeffs}")
-    # TODO ??? nie wiem kurwa
+    generator_poly = galois.Poly(generator, field=field)
+    max_shifts = len(codeword)  # maximum number of cyclic shifts
 
-    return 0, 0
+    for i in range(max_shifts):
+        # Calculate the syndrome as the remainder of the division by the generator polynomial
+        syndrome_poly = codeword_poly % generator_poly
+        syndrome = syndrome_poly.coeffs
+
+        # Pad the syndrome to the required length (if necessary)
+        while len(syndrome) < len(generator) - 1:
+            syndrome = np.append(syndrome, field(0))
+
+        # Calculate the Hamming weight of the syndrome
+        hamming_weight = sum(1 for s in syndrome if s != field(0))
+        print(f"Syndrome: {syndrome}, Hamming weight: {hamming_weight}")
+
+        if hamming_weight <= t:
+            # Correction: add the syndrome to the current vector
+            corrected_codeword = (codeword_poly + syndrome_poly).coeffs
+            # Restore the original position only if there was a shift
+            if i > 0:
+                corrected_codeword = np.roll(corrected_codeword, -i)
+            print(f"Corrected codeword: {corrected_codeword}")
+            return corrected_codeword, hamming_weight  # Return the corrected code and the number of errors
+
+        # Cyclic shift to the right
+        codeword_poly = galois.Poly(np.roll(codeword, i + 1), field=field)
+        print(f"Codeword after {i + 1}-th shift: {codeword_poly.coeffs}")
+
+    # If correction is not possible
+    print("Uncorrectable errors")
+    return None, None
 
 
 def true_decode_bch(input_data, field):
