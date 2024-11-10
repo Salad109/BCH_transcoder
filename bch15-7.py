@@ -37,7 +37,7 @@ def flip_bits(input_data, error_count=1):
     return flipped_data
 
 
-def decode_bch(codeword, generator, field, t=1):
+def decode_bch(codeword, generator, field, t=2):
     codeword_poly = galois.Poly(codeword, field=field)
     generator_poly = galois.Poly(generator, field=field)
     max_shifts = len(codeword)  # maximum number of cyclic shifts
@@ -87,7 +87,7 @@ def true_decode_bch(input_data, field):
 # ============================
 data = [1, 0, 1, 0, 1, 0, 1]
 generator = [1, 1, 1, 0, 1, 0, 0, 0, 1]
-error_count = 1 # TODO breaks at 2
+error_count = 2
 field = galois.GF(2)
 
 generator_bits, parity_bits, codeword_bits = encode_bch(data, generator, field)
@@ -108,7 +108,7 @@ print(f"Errors introduced: {error_count}")
 print(f"Codeword with errors: {codeword_bits}")
 print("===============================")
 
-decoded_bits, error_count = decode_bch(flipped_codeword_bits, generator_bits, field)
+decoded_bits, error_count = decode_bch(flipped_codeword_bits, generator_bits, field, error_count)
 true_decoded_bits, true_error_count = true_decode_bch(flipped_codeword_bits, field)
 print(f"Decoded codeword: {decoded_bits}, errors identified: {error_count}")
 print(f"True decoded codeword: {true_decoded_bits}, errors identified: {true_error_count}")
