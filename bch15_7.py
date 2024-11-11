@@ -1,9 +1,11 @@
-import random
 import galois
 import numpy as np
+from transmission_simulation import flip_random_bits
 
 
-def encode_bch(data, generator, field):
+def encode_bch(data, output="codeword"):
+    field = galois.GF(2)
+    generator = [1, 1, 1, 0, 1, 0, 0, 0, 1]
     data_poly = galois.Poly(data, field=field)
     generator_poly = galois.Poly(generator, field=field)
 
@@ -13,31 +15,28 @@ def encode_bch(data, generator, field):
     parity_poly = shifted_data % generator_poly
 
     codeword_poly = shifted_data + parity_poly
-    return generator_poly.coeffs, parity_poly.coeffs, codeword_poly.coeffs
+
+    if (output == "codeword"):
+        return codeword_poly.coeffs
+    elif (output == "all"):
+        return codeword_poly.coeffs, generator_poly.coeffs, parity_poly.coeffs
 
 
-def true_encode_bch(data, field):
+def true_encode_bch(data, output="codeword"):
+    field = galois.GF(2)
     bch_code = galois.BCH(n=15, k=7, field=field)
     generator_poly = bch_code.generator_poly.coeffs
     parity_poly = bch_code.encode(data, output="parity")
     codeword_poly = bch_code.encode(data, output="codeword")
-    return generator_poly, parity_poly, codeword_poly
+    if (output == "codeword"):
+        return codeword_poly
+    elif (output == "all"):
+        return codeword_poly, generator_poly, parity_poly
 
 
-def flip_bits(input_data, error_count=1):
-    flipped_data = input_data.copy()
-    data_length = len(flipped_data)
-    if error_count > data_length:
-        raise ValueError("Not enough unique numbers in the specified range.")
-
-    flip_indexes = random.sample(range(0, data_length), error_count)
-    for index in flip_indexes:
-        flipped_data[index] ^= 1
-
-    return flipped_data
-
-
-def decode_bch(codeword, generator, field, t=2):
+def decode_bch(codeword, t=2):
+    field = galois.GF(2)
+    generator = [1, 1, 1, 0, 1, 0, 0, 0, 1]
     codeword_poly = galois.Poly(codeword, field=field)
     generator_poly = galois.Poly(generator, field=field)
     max_shifts = len(codeword)  # maximum number of cyclic shifts
@@ -78,39 +77,39 @@ def decode_bch(codeword, generator, field, t=2):
     return None, None
 
 
-def true_decode_bch(input_data, field):
+def true_decode_bch(input_data):
+    field = galois.GF(2)
     bch_code = galois.BCH(n=15, k=7, field=field)
     decoded_codeword, errors = bch_code.decode(input_data, output="codeword", errors=True)
     return decoded_codeword, errors
 
 
 # ============================
-data = [1, 0, 1, 0, 1, 0, 1]
-generator = [1, 1, 1, 0, 1, 0, 0, 0, 1]
-error_count = 2
-field = galois.GF(2)
+if __name__ == "__main__":
+    data = [1, 0, 1, 0, 1, 0, 1]
+    error_count = 2
 
-generator_bits, parity_bits, codeword_bits = encode_bch(data, generator, field)
-print(f"Generator: {generator_bits}")
-print(f"Parity bits: {parity_bits}")
-print(f"Codeword: {codeword_bits}")
-print("-------------------------------")
-true_gen_poly, true_parity_bits, true_codeword_bits = true_encode_bch(data, field)
-print(f"True generator: {true_gen_poly}")
-print(f"True parity bits: {true_parity_bits}")
-print(f"True codeword: {true_codeword_bits}")
+    codeword_bits, generator_bits, parity_bits  = encode_bch(data, output="all")
+    print(f"Codeword: {codeword_bits}")
+    print(f"Generator: {generator_bits}")
+    print(f"Parity bits: {parity_bits}")
+    print("-------------------------------")
+    true_codeword_bits, true_generator_bits, true_parity_bits  = true_encode_bch(data, output="all")
+    print(f"True codeword: {true_codeword_bits}")
+    print(f"True generator: {true_generator_bits}")
+    print(f"True parity bits: {true_parity_bits}")
 
-assert np.array_equal(codeword_bits, true_codeword_bits), "Encoded codeword differs form true encoded codeword"
-print("===============================")
+    assert np.array_equal(codeword_bits, true_codeword_bits), "Encoded codeword differs form true encoded codeword"
+    print("===============================")
 
-flipped_codeword_bits = flip_bits(codeword_bits, error_count)
-print(f"Errors introduced: {error_count}")
-print(f"Codeword with errors: {codeword_bits}")
-print("===============================")
+    flipped_codeword_bits = flip_random_bits(codeword_bits, error_count)
+    print(f"Errors introduced: {error_count}")
+    print(f"Codeword with errors: {flipped_codeword_bits}")
+    print("===============================")
 
-decoded_bits, error_count = decode_bch(flipped_codeword_bits, generator_bits, field, error_count)
-true_decoded_bits, true_error_count = true_decode_bch(flipped_codeword_bits, field)
-print(f"Decoded codeword: {decoded_bits}, errors identified: {error_count}")
-print(f"True decoded codeword: {true_decoded_bits}, errors identified: {true_error_count}")
-assert np.array_equal(decoded_bits, true_decoded_bits), "Decoded codeword does not match the true codeword"
-assert np.array_equal(codeword_bits, decoded_bits), "Decoded codeword do not match original codeword"
+    decoded_bits, error_count = decode_bch(flipped_codeword_bits)
+    true_decoded_bits, true_error_count = true_decode_bch(flipped_codeword_bits)
+    print(f"Decoded codeword: {decoded_bits}, errors identified: {error_count}")
+    print(f"True decoded codeword: {true_decoded_bits}, errors identified: {true_error_count}")
+    assert np.array_equal(decoded_bits, true_decoded_bits), "Decoded codeword does not match the true codeword"
+    assert np.array_equal(codeword_bits, decoded_bits), "Decoded codeword does not match original codeword"
