@@ -96,7 +96,7 @@ def true_decode_bch(input_data):
 
 # ============================
 if __name__ == "__main__":
-    data = [0, 0, 0, 0]
+    data = [0, 1, 0, 1]
     error_count = 1
 
     codeword_bits, generator_bits, parity_bits = encode_bch(data, output="all")
