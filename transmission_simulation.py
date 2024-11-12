@@ -27,10 +27,10 @@ if __name__ == "__main__":
     import bch15_7
 
     data = [1, 0, 1, 0, 1, 0, 1]
+    BER = 0.15
 
     encoded_data = bch15_7.encode_bch(data)
-
-    errors = introduce_error(encoded_data)
+    errors = introduce_error(encoded_data, BER)
 
     decoded_data = bch15_7.decode_bch(encoded_data)[0].tolist()[:len(data)]
 
