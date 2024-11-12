@@ -13,13 +13,23 @@ def encode_bch(data, output="codeword"):
     shifted_data = data_poly * galois.Poly([1] + [0] * degree, field=field)
 
     parity_poly = shifted_data % generator_poly
-
     codeword_poly = shifted_data + parity_poly
 
-    if (output == "codeword"):
-        return codeword_poly.coeffs
-    elif (output == "all"):
-        return generator_poly.coeffs, parity_poly.coeffs, codeword_poly.coeffs
+    # Ensure codeword has a length of 7
+    codeword_coeffs = codeword_poly.coeffs
+    if len(codeword_coeffs) < 7:
+        codeword_coeffs = np.pad(codeword_coeffs, (7 - len(codeword_coeffs), 0), 'constant', constant_values=0)
+
+    if output == "codeword":
+        return codeword_coeffs
+    elif output == "all":
+        # Generator polynomial (no padding required)
+        generator_coeffs = generator_poly.coeffs
+        # Parity polynomial should be exactly 3 bits (no padding beyond 3)
+        parity_coeffs = parity_poly.coeffs
+        if len(parity_coeffs) < 8:
+            parity_coeffs = np.pad(parity_coeffs, (3 - len(parity_coeffs), 0), 'constant', constant_values=0)
+        return codeword_coeffs, generator_coeffs, parity_coeffs
 
 
 def true_encode_bch(data, output="codeword"):
@@ -52,7 +62,7 @@ def decode_bch(codeword, t=1):
 
         # Calculate the Hamming weight of the syndrome
         hamming_weight = sum(1 for s in syndrome if s != field(0))
-        print(f"Syndrome: {syndrome}, Hamming weight: {hamming_weight}")
+        # print(f"Syndrome: {syndrome}, Hamming weight: {hamming_weight}")
 
         if hamming_weight <= t:
             # Correction: add the syndrome to the current vector
@@ -65,12 +75,12 @@ def decode_bch(codeword, t=1):
                                             'constant', constant_values=0)
             if i > 0:
                 corrected_codeword = np.roll(corrected_codeword, -i)
-            print(f"Corrected codeword: {corrected_codeword}")
+            # print(f"Corrected codeword: {corrected_codeword}")
             return corrected_codeword, hamming_weight  # Return the corrected code and the number of errors
 
         # Cyclic shift to the right
         codeword_poly = galois.Poly(np.roll(codeword, i + 1), field=field)
-        print(f"Codeword after {i + 1}-th shift: {codeword_poly.coeffs}")
+        # print(f"Codeword after {i + 1}-th shift: {codeword_poly.coeffs}")
 
     # If correction is not possible
     print("Uncorrectable errors")
@@ -86,15 +96,15 @@ def true_decode_bch(input_data):
 
 # ============================
 if __name__ == "__main__":
-    data = [1, 0, 0, 1]
-    error_count = 2
+    data = [0, 0, 0, 0]
+    error_count = 1
 
-    codeword_bits, generator_bits, parity_bits  = encode_bch(data, output="all")
+    codeword_bits, generator_bits, parity_bits = encode_bch(data, output="all")
     print(f"Codeword: {codeword_bits}")
     print(f"Generator: {generator_bits}")
     print(f"Parity bits: {parity_bits}")
     print("-------------------------------")
-    true_codeword_bits, true_generator_bits, true_parity_bits  = true_encode_bch(data, output="all")
+    true_codeword_bits, true_generator_bits, true_parity_bits = true_encode_bch(data, output="all")
     print(f"True codeword: {true_codeword_bits}")
     print(f"True generator: {true_generator_bits}")
     print(f"True parity bits: {true_parity_bits}")
