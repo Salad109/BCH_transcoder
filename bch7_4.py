@@ -83,7 +83,7 @@ def decode_bch(codeword, t=1):
         # print(f"Codeword after {i + 1}-th shift: {codeword_poly.coeffs}")
 
     # If correction is not possible
-    print("Uncorrectable errors")
+    # print("Uncorrectable errors")
     return None, None
 
 
