@@ -2,6 +2,8 @@ import galois
 import numpy as np
 from transmission_simulation import flip_random_bits
 
+n=7
+k=4
 
 def encode_bch(data, output="codeword"):
     field = galois.GF(2)
