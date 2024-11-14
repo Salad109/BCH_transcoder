@@ -2,8 +2,10 @@ import galois
 import numpy as np
 from transmission_simulation import flip_random_bits
 
-n=15
-k=7
+n = 15
+k = 7
+t = 2
+
 
 def encode_bch(data, output="codeword"):
     field = galois.GF(2)
@@ -19,8 +21,8 @@ def encode_bch(data, output="codeword"):
 
     # Ensure codeword has a length of 15
     codeword_coeffs = codeword_poly.coeffs
-    if len(codeword_coeffs) < 15:
-        codeword_coeffs = np.pad(codeword_coeffs, (15 - len(codeword_coeffs), 0), 'constant', constant_values=0)
+    if len(codeword_coeffs) < n:
+        codeword_coeffs = np.pad(codeword_coeffs, (n - len(codeword_coeffs), 0), 'constant', constant_values=0)
 
     if output == "codeword":
         return codeword_coeffs
@@ -29,14 +31,14 @@ def encode_bch(data, output="codeword"):
         generator_coeffs = generator_poly.coeffs
         # Parity polynomial should be exactly 8 bits (no padding beyond 8)
         parity_coeffs = parity_poly.coeffs
-        if len(parity_coeffs) < 8:
-            parity_coeffs = np.pad(parity_coeffs, (8 - len(parity_coeffs), 0), 'constant', constant_values=0)
+        if len(parity_coeffs) < n - k:
+            parity_coeffs = np.pad(parity_coeffs, (n - k - len(parity_coeffs), 0), 'constant', constant_values=0)
         return codeword_coeffs, generator_coeffs, parity_coeffs
 
 
 def true_encode_bch(data, output="codeword"):
     field = galois.GF(2)
-    bch_code = galois.BCH(n=15, k=7, field=field)
+    bch_code = galois.BCH(n=n, k=k, field=field)
     generator_poly = bch_code.generator_poly.coeffs
     parity_poly = bch_code.encode(data, output="parity")
     codeword_poly = bch_code.encode(data, output="codeword")
@@ -91,7 +93,7 @@ def decode_bch(codeword, t=2):
 
 def true_decode_bch(input_data):
     field = galois.GF(2)
-    bch_code = galois.BCH(n=15, k=7, field=field)
+    bch_code = galois.BCH(n=n, k=k, field=field)
     decoded_codeword, errors = bch_code.decode(input_data, output="codeword", errors=True)
     return decoded_codeword, errors
 
@@ -99,7 +101,7 @@ def true_decode_bch(input_data):
 # ============================
 if __name__ == "__main__":
     data = [1, 0, 1, 0, 1, 0, 1]
-    error_count = 2
+    error_count = t
 
     codeword_bits, generator_bits, parity_bits = encode_bch(data, output="all")
     print(f"Codeword: {codeword_bits}")
