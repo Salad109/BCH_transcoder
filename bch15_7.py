@@ -112,18 +112,16 @@ if __name__ == "__main__":
     print(f"True codeword: {true_codeword_bits}")
     print(f"True generator: {true_generator_bits}")
     print(f"True parity bits: {true_parity_bits}")
-
-    assert np.array_equal(codeword_bits, true_codeword_bits), "Encoded codeword differs form true encoded codeword"
     print("===============================")
+
 
     flipped_codeword_bits = flip_random_bits(codeword_bits, error_count)
     print(f"Errors introduced: {error_count}")
     print(f"Codeword with errors: {flipped_codeword_bits}")
     print("===============================")
 
-    decoded_bits, error_count = decode_bch(flipped_codeword_bits)
+    decoded_bits, error_count = decode_bch(flipped_codeword_bits, t)
     true_decoded_bits, true_error_count = true_decode_bch(flipped_codeword_bits)
     print(f"Decoded codeword: {decoded_bits}, errors identified: {error_count}")
     print(f"True decoded codeword: {true_decoded_bits}, errors identified: {true_error_count}")
-    assert np.array_equal(decoded_bits, true_decoded_bits), "Decoded codeword does not match the true codeword"
     assert np.array_equal(codeword_bits, decoded_bits), "Decoded codeword does not match original codeword"

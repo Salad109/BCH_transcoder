@@ -2,14 +2,14 @@ import galois
 import numpy as np
 from transmission_simulation import flip_random_bits
 
-n = 7
-k = 4
-t = 1
+n = 31
+k = 6
+t = 7
 
 
 def encode_bch(data, output="codeword"):
     field = galois.GF(2)
-    generator = [1, 0, 1, 1]
+    generator = [1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1,]  # BCH generator polynomial
     data_poly = galois.Poly(data, field=field)
     generator_poly = galois.Poly(generator, field=field)
 
@@ -19,7 +19,7 @@ def encode_bch(data, output="codeword"):
     parity_poly = shifted_data % generator_poly
     codeword_poly = shifted_data + parity_poly
 
-    # Ensure codeword has a length of 7
+    # Ensure codeword has a length of 31
     codeword_coeffs = codeword_poly.coeffs
     if len(codeword_coeffs) < n:
         codeword_coeffs = np.pad(codeword_coeffs, (n - len(codeword_coeffs), 0), 'constant', constant_values=0)
@@ -29,7 +29,7 @@ def encode_bch(data, output="codeword"):
     elif output == "all":
         # Generator polynomial (no padding required)
         generator_coeffs = generator_poly.coeffs
-        # Parity polynomial should be exactly 3 bits (no padding beyond 3)
+        # Parity polynomial should be exactly 25 bits (no padding beyond 25)
         parity_coeffs = parity_poly.coeffs
         if len(parity_coeffs) < n - k:
             parity_coeffs = np.pad(parity_coeffs, (n - k - len(parity_coeffs), 0), 'constant', constant_values=0)
@@ -48,9 +48,9 @@ def true_encode_bch(data, output="codeword"):
         return codeword_poly, generator_poly, parity_poly
 
 
-def decode_bch(codeword, t=1):
+def decode_bch(codeword, t=7):
     field = galois.GF(2)
-    generator = [1, 0, 1, 1]
+    generator = [1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1,]
     codeword_poly = galois.Poly(codeword, field=field)
     generator_poly = galois.Poly(generator, field=field)
     max_shifts = len(codeword)  # maximum number of cyclic shifts
@@ -100,7 +100,7 @@ def true_decode_bch(input_data):
 
 # ============================
 if __name__ == "__main__":
-    data = [0, 1, 0, 1]
+    data = [1, 0, 1, 0, 1, 0]
     error_count = t
 
     codeword_bits, generator_bits, parity_bits = encode_bch(data, output="all")
