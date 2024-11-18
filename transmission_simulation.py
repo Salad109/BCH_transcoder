@@ -131,7 +131,7 @@ if __name__ == "__main__":
     # Simulation parameters
     Max_BER = 1.0  # Maximum bit error rate to test for(assuming it won't be terminated first by early stopping)
     BER_step = 0.025  # BER step value
-    message_sample_size = 1000  # How many randomized messages to send per BER value
+    message_sample_size = 500  # How many randomized messages to send per BER value
     patience = 2  # Stop after this many epochs' success rate is smaller or equal to patience_value
     threshold = 0.0
 
@@ -173,19 +173,18 @@ if __name__ == "__main__":
 
     # Plotting
     plt.figure(figsize=(10, 6))
-
-    plt.plot(bch127_8_BER_history, bch127_8_success_history, color='yellow', linestyle='-', linewidth=2,
-             label='BCH(127,8), t=31')
+    plt.plot(bch127_8_BER_history, bch127_8_success_history, color='purple', linestyle='-', linewidth=2,
+             label='BCH(127,8), t=31', marker='X')
     plt.plot(bch31_6_BER_history, bch31_6_success_history, color='red', linestyle='-', linewidth=2,
-             label='BCH(31,6), t=7')
-    plt.plot(bch15_7_BER_history, bch15_7_success_history, color='green', linestyle='-', linewidth=2,
-             label='BCH(15,7), t=2')
+             label='BCH(31,6), t=7', marker='D')
+    plt.plot(bch15_7_BER_history, bch15_7_success_history, color='lawngreen', linestyle='-', linewidth=2,
+             label='BCH(15,7), t=2', marker='s')
     plt.plot(bch7_4_BER_history, bch7_4_success_history, color='blue', linestyle='-', linewidth=2,
-             label='BCH(7,4), t=1')
-    plt.plot(baseline_BER_history, baseline_success_history, color='black', linestyle='-', linewidth=2,
+             label='BCH(7,4), t=1', marker='^')
+    plt.plot(baseline_BER_history, baseline_success_history, color='black', linestyle='--', linewidth=2,
              label='No encoding(k=7), t=0')
 
-    plt.title("Success Rate vs. BER for various BCH Codes", fontsize=14, fontweight='bold')
+    plt.title("Success Rate vs. BER for various BCH Codes", fontsize=20, fontweight='bold')
     plt.xlabel("Bit Error Rate (BER)", fontsize=12)
     plt.ylabel("Success Rate", fontsize=12)
     plt.grid(True, linestyle='--', linewidth=0.5)
