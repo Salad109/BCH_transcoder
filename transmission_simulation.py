@@ -24,6 +24,7 @@ def introduce_error(input_data, ber=0.1):
 
 
 if __name__ == "__main__":
+    import bch127_8
     import bch31_6
     import bch15_7
     import bch7_4
@@ -65,13 +66,13 @@ if __name__ == "__main__":
 
             success_history.append(success_rate)
             ber_history.append(ber)
-            ber += ber_step
             current_step += 1
             total_epoch_time = time.perf_counter() - start_time
 
             print(
                 f"Code: BCH({n},{k})\t| BER: {ber:5.3} | Epoch: {current_step:4} / {int(Max_BER / BER_step):4}"
-                f" | Success rate: {success_rate:5.4} | Time: {total_epoch_time:5.3}s")
+                f" | Success rate: {success_rate:6.4} | Time: {total_epoch_time:5.3}s")
+            ber += ber_step
 
             # Early stopping
             if len(success_history) > patience_count and all(
@@ -110,13 +111,13 @@ if __name__ == "__main__":
 
             success_history.append(success_rate)
             ber_history.append(ber)
-            ber += ber_step
             current_step += 1
             total_epoch_time = time.perf_counter() - start_time
 
             print(
                 f"Code: No encoding (k={k})\t| BER: {ber:5.3} | Epoch: {current_step:4} / {int(Max_BER / BER_step):4}"
-                f" | Success rate: {success_rate:5.4} | Time: {total_epoch_time:5.3}s")
+                f" | Success rate: {success_rate:6.4} | Time: {total_epoch_time:5.3}s")
+            ber += ber_step
 
             # Early stopping
             if len(success_history) > patience_count and all(
@@ -130,12 +131,19 @@ if __name__ == "__main__":
     # Simulation parameters
     Max_BER = 1.0  # Maximum bit error rate to test for(assuming it won't be terminated first by early stopping)
     BER_step = 0.025  # BER step value
-    message_sample_size = 500  # How many randomized messages to send per BER value
+    message_sample_size = 1000  # How many randomized messages to send per BER value
     patience = 2  # Stop after this many epochs' success rate is smaller or equal to patience_value
     threshold = 0.0
 
     # Running simulations
     simulation_start_time = time.perf_counter()
+
+    bch127_8_success_history, bch127_8_BER_history = run_simulation(bch_code=bch127_8,
+                                                                    max_ber=Max_BER,
+                                                                    ber_step=BER_step,
+                                                                    sample_size=message_sample_size,
+                                                                    patience_count=patience,
+                                                                    patience_threshold=threshold)
     bch31_6_success_history, bch31_6_BER_history = run_simulation(bch_code=bch31_6,
                                                                   max_ber=Max_BER,
                                                                   ber_step=BER_step,
@@ -166,6 +174,8 @@ if __name__ == "__main__":
     # Plotting
     plt.figure(figsize=(10, 6))
 
+    plt.plot(bch127_8_BER_history, bch127_8_success_history, color='yellow', linestyle='-', linewidth=2,
+             label='BCH(127,8), t=31')
     plt.plot(bch31_6_BER_history, bch31_6_success_history, color='red', linestyle='-', linewidth=2,
              label='BCH(31,6), t=7')
     plt.plot(bch15_7_BER_history, bch15_7_success_history, color='green', linestyle='-', linewidth=2,
@@ -173,7 +183,7 @@ if __name__ == "__main__":
     plt.plot(bch7_4_BER_history, bch7_4_success_history, color='blue', linestyle='-', linewidth=2,
              label='BCH(7,4), t=1')
     plt.plot(baseline_BER_history, baseline_success_history, color='black', linestyle='-', linewidth=2,
-             label='No encoding(k=7, t=0)')
+             label='No encoding(k=7), t=0')
 
     plt.title("Success Rate vs. BER for various BCH Codes", fontsize=14, fontweight='bold')
     plt.xlabel("Bit Error Rate (BER)", fontsize=12)
