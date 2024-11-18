@@ -70,7 +70,8 @@ if __name__ == "__main__":
             total_epoch_time = time.perf_counter() - start_time
 
             print(
-                f"Code: BCH({n},{k})\t| BER: {ber:5.3} | Epoch: {current_step:4} / {int(Max_BER / BER_step):4} | Success rate: {success_rate:5.4} | Time: {total_epoch_time:5.3}s")
+                f"Code: BCH({n},{k})\t| BER: {ber:5.3} | Epoch: {current_step:4} / {int(Max_BER / BER_step):4}"
+                f" | Success rate: {success_rate:5.4} | Time: {total_epoch_time:5.3}s")
 
             # Early stopping
             if len(success_history) > patience_count and all(
@@ -114,7 +115,8 @@ if __name__ == "__main__":
             total_epoch_time = time.perf_counter() - start_time
 
             print(
-                f"Code: No encoding (k={k})\t| BER: {ber:5.3} | Epoch: {current_step:4} / {int(Max_BER / BER_step):4} | Success rate: {success_rate:5.4} | Time: {total_epoch_time:5.3}s")
+                f"Code: No encoding (k={k})\t| BER: {ber:5.3} | Epoch: {current_step:4} / {int(Max_BER / BER_step):4}"
+                f" | Success rate: {success_rate:5.4} | Time: {total_epoch_time:5.3}s")
 
             # Early stopping
             if len(success_history) > patience_count and all(
@@ -171,7 +173,7 @@ if __name__ == "__main__":
     plt.plot(bch7_4_BER_history, bch7_4_success_history, color='blue', linestyle='-', linewidth=2,
              label='BCH(7,4), t=1')
     plt.plot(baseline_BER_history, baseline_success_history, color='black', linestyle='-', linewidth=2,
-             label='No encoding, t=0')
+             label='No encoding(k=7, t=0)')
 
     plt.title("Success Rate vs. BER for various BCH Codes", fontsize=14, fontweight='bold')
     plt.xlabel("Bit Error Rate (BER)", fontsize=12)
@@ -180,6 +182,6 @@ if __name__ == "__main__":
     plt.legend(loc="upper right", prop={'size': 15})
 
     text = f"BER step: {BER_step}\nMessages per step per code: {message_sample_size}"
-    plt.annotate(text, (0,0), (0, -20), xycoords='axes fraction', textcoords='offset points', va='top')
+    plt.annotate(text, (0, 0), (0, -20), xycoords='axes fraction', textcoords='offset points', va='top')
 
     plt.show()
