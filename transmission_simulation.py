@@ -29,6 +29,7 @@ if __name__ == "__main__":
     import bch15_7
     import bch7_4
     import matplotlib.pyplot as plt
+    import numpy as np
 
 
     def run_simulation(bch_code, max_ber=1.0, ber_step=0.05, sample_size=100, patience_count=5, patience_threshold=0.0):
@@ -44,19 +45,17 @@ if __name__ == "__main__":
             start_time = time.perf_counter()
             success_count = 0
             for attempt in range(sample_size):
-                data = []
-                for i in range(k):
-                    data.append(random.randint(0, 1))
+                data = np.random.randint(2, size=k)
 
                 encoded_data = bch_code.encode_bch(data)
                 error_data = introduce_error(encoded_data, ber)
 
-                try:
-                    decoded_data = bch_code.decode_bch(error_data)[0].tolist()[:len(data)]
-                except AttributeError:
+                decoded_data = bch_code.decode_bch(error_data)
+                if decoded_data[0] is None:
                     continue
+                decoded_data = decoded_data[0].tolist()[:len(data)]
 
-                if decoded_data == data:
+                if decoded_data == data.tolist():
                     success_count += 1
 
             try:
@@ -131,7 +130,7 @@ if __name__ == "__main__":
     # Simulation parameters
     Max_BER = 1.0  # Maximum bit error rate to test for(assuming it won't be terminated first by early stopping)
     BER_step = 0.025  # BER step value
-    message_sample_size = 500  # How many randomized messages to send per BER value
+    message_sample_size = 100  # How many randomized messages to send per BER value
     patience = 2  # Stop after this many epochs' success rate is smaller or equal to threshold
     threshold = 0.05
 
@@ -193,5 +192,42 @@ if __name__ == "__main__":
     text = f"BER step: {BER_step}\nMessages per step per code: {message_sample_size}"
     plt.annotate(text, (0, 0), (0, -20), xycoords='axes fraction', textcoords='offset points', va='top')
 
-    plt.savefig('plot.svg', format='svg')
+    plt.savefig('success_rate_plot.svg', format='svg')
+    plt.show()
+
+
+    def get_effective_transmission_speed(bch_code, success_history):
+        data_ratio = bch_code.k / bch_code.n
+        speed_history = []
+        for success_rate in success_history:
+            speed_history.append(success_rate * data_ratio)
+        return speed_history
+
+
+    bch127_8_speed = get_effective_transmission_speed(bch127_8, bch127_8_success_history)
+    bch31_6_speed = get_effective_transmission_speed(bch31_6, bch31_6_success_history)
+    bch15_7_speed = get_effective_transmission_speed(bch15_7, bch15_7_success_history)
+    bch_7_4_speed = get_effective_transmission_speed(bch7_4, bch7_4_success_history)
+    baseline_speed = baseline_success_history
+
+    # Plotting
+    plt.figure(figsize=(10, 6))
+    plt.plot(bch127_8_BER_history, bch127_8_speed, color='purple', linestyle='-', linewidth=2,
+             label='BCH(127,8), t=31')
+    plt.plot(bch31_6_BER_history, bch31_6_speed, color='red', linestyle='-', linewidth=2,
+             label='BCH(31,6), t=7')
+    plt.plot(bch15_7_BER_history, bch15_7_speed, color='lawngreen', linestyle='-', linewidth=2,
+             label='BCH(15,7), t=2')
+    plt.plot(bch7_4_BER_history, bch_7_4_speed, color='blue', linestyle='-', linewidth=2,
+             label='BCH(7,4), t=1')
+    plt.plot(baseline_BER_history, baseline_speed, color='black', linestyle='--', linewidth=2,
+             label='No encoding(k=7), t=0')
+
+    plt.title("Data transmission effective speed vs. BER for various BCH Codes", fontsize=20, fontweight='bold')
+    plt.xlabel("Bit Error Rate (BER)", fontsize=12)
+    plt.ylabel("Data transmission effective speed", fontsize=12)
+    plt.grid(True, linestyle='--', linewidth=0.5)
+    plt.legend(loc="upper right", prop={'size': 15})
+
+    plt.savefig('speed_plot.svg', format='svg')
     plt.show()
