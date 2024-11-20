@@ -116,44 +116,44 @@ if __name__ == "__main__":
 
 
     # Simulation parameters
-    Max_BER = 1.0  # Maximum bit error rate to test for(assuming it won't be terminated first by early stopping)
-    BER_step = 0.025  # BER step value
-    message_sample_size = 100  # How many randomized messages to send per BER value
-    patience = 2  # Stop after this many epochs' success rate is smaller or equal to threshold
-    threshold = 0.05
+    MAX_BER = 1.0  # Maximum bit error rate to test for(assuming it won't be terminated first by early stopping)
+    BER_STEP = 0.025  # BER step value
+    SAMPLE_SIZE = 10  # How many randomized messages to send per BER value
+    PATIENCE = 2  # Stop after this many epochs' success rate is smaller or equal to threshold
+    THRESHOLD = 0.05
 
     # Running simulations
     simulation_start_time = time.perf_counter()
     bch127_8_success_history, bch127_8_BER_history = run_simulation(k=bch127_8.k, bch_code=bch127_8,
-                                                                    max_ber=Max_BER,
-                                                                    ber_step=BER_step,
-                                                                    sample_size=message_sample_size,
-                                                                    patience_count=patience,
-                                                                    patience_threshold=threshold)
+                                                                    max_ber=MAX_BER,
+                                                                    ber_step=BER_STEP,
+                                                                    sample_size=SAMPLE_SIZE,
+                                                                    patience_count=PATIENCE,
+                                                                    patience_threshold=THRESHOLD)
     bch31_6_success_history, bch31_6_BER_history = run_simulation(k=bch31_6.k, bch_code=bch31_6,
-                                                                  max_ber=Max_BER,
-                                                                  ber_step=BER_step,
-                                                                  sample_size=message_sample_size,
-                                                                  patience_count=patience,
-                                                                  patience_threshold=threshold)
+                                                                  max_ber=MAX_BER,
+                                                                  ber_step=BER_STEP,
+                                                                  sample_size=SAMPLE_SIZE,
+                                                                  patience_count=PATIENCE,
+                                                                  patience_threshold=THRESHOLD)
     bch15_7_success_history, bch15_7_BER_history = run_simulation(k=bch15_7.k, bch_code=bch15_7,
-                                                                  max_ber=Max_BER,
-                                                                  ber_step=BER_step,
-                                                                  sample_size=message_sample_size,
-                                                                  patience_count=patience,
-                                                                  patience_threshold=threshold)
+                                                                  max_ber=MAX_BER,
+                                                                  ber_step=BER_STEP,
+                                                                  sample_size=SAMPLE_SIZE,
+                                                                  patience_count=PATIENCE,
+                                                                  patience_threshold=THRESHOLD)
     bch7_4_success_history, bch7_4_BER_history = run_simulation(k=bch7_4.k, bch_code=bch7_4,
-                                                                max_ber=Max_BER,
-                                                                ber_step=BER_step,
-                                                                sample_size=message_sample_size,
-                                                                patience_count=patience,
-                                                                patience_threshold=threshold)
+                                                                max_ber=MAX_BER,
+                                                                ber_step=BER_STEP,
+                                                                sample_size=SAMPLE_SIZE,
+                                                                patience_count=PATIENCE,
+                                                                patience_threshold=THRESHOLD)
     baseline_success_history, baseline_BER_history = run_simulation(k=7,
-                                                                    max_ber=Max_BER,
-                                                                    ber_step=BER_step,
-                                                                    sample_size=message_sample_size,
-                                                                    patience_count=patience,
-                                                                    patience_threshold=threshold)
+                                                                    max_ber=MAX_BER,
+                                                                    ber_step=BER_STEP,
+                                                                    sample_size=SAMPLE_SIZE,
+                                                                    patience_count=PATIENCE,
+                                                                    patience_threshold=THRESHOLD)
     total_time = time.perf_counter() - simulation_start_time
     print(f"Simulation took {int(total_time // 60)} minutes and {total_time % 60:.2f} seconds")
 
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     plt.grid(True, linestyle='--', linewidth=0.5)
     plt.legend(loc="upper right", prop={'size': 15})
 
-    text = f"BER step: {BER_step}\nMessages per step per code: {message_sample_size}"
+    text = f"BER step: {BER_STEP}\nMessages per step per code: {SAMPLE_SIZE}"
     plt.annotate(text, (0, 0), (0, -20), xycoords='axes fraction', textcoords='offset points', va='top')
 
     plt.savefig('success_rate_plot.svg', format='svg')
