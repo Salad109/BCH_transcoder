@@ -124,7 +124,6 @@ if __name__ == "__main__":
 
     # Running simulations
     simulation_start_time = time.perf_counter()
-
     bch127_8_success_history, bch127_8_BER_history = run_simulation(k=bch127_8.k, bch_code=bch127_8,
                                                                     max_ber=Max_BER,
                                                                     ber_step=BER_step,
@@ -183,7 +182,7 @@ if __name__ == "__main__":
     plt.savefig('success_rate_plot.svg', format='svg')
     plt.show()
 
-
+    # Transmission speed calculations
     def get_effective_transmission_speed(bch_code, success_history):
         data_ratio = bch_code.k / bch_code.n
         speed_history = []
@@ -198,7 +197,6 @@ if __name__ == "__main__":
     bch_7_4_speed = get_effective_transmission_speed(bch7_4, bch7_4_success_history)
     baseline_speed = baseline_success_history
 
-    # Plotting
     plt.figure(figsize=(10, 6))
     plt.plot(bch127_8_BER_history, bch127_8_speed, color='purple', linestyle='-', linewidth=2,
              label='BCH(127,8), t=31')
