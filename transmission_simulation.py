@@ -1,5 +1,4 @@
 import random
-import time
 
 
 def flip_random_bits(input_data, error_count=1):
@@ -30,99 +29,88 @@ if __name__ == "__main__":
     import bch7_4
     import matplotlib.pyplot as plt
     import numpy as np
+    import time
 
 
-    def run_simulation(bch_code, max_ber=1.0, ber_step=0.05, sample_size=100, patience_count=5, patience_threshold=0.0):
-        n = bch_code.n
-        k = bch_code.k
+    def run_simulation(k, bch_code=None, max_ber=1.0, ber_step=0.05, sample_size=100, patience_count=5,
+                       patience_threshold=0.0):
+        """
+        Simulates performance for BCH codes or a baseline scenario.
+
+        Args:
+            k (int): Length of the input data (message size).
+            bch_code (object or None): BCH code object with encode_bch and decode_bch methods. If None, runs baseline.
+            max_ber (float): Maximum Bit Error Rate to test.
+            ber_step (float): Incremental step for BER.
+            sample_size (int): Number of samples per BER to test.
+            patience_count (int): Number of consecutive BERs with low success rates to trigger early stopping.
+            patience_threshold (float): Minimum success rate to prevent early stopping.
+
+        Returns:
+            success_history (list of float): Success rates for each BER step.
+            ber_history (list of float): Tested BER values.
+        """
+        if sample_size <= 0:
+            raise ValueError("sample_size must be positive.")
+        if ber_step <= 0 or max_ber <= 0:
+            raise ValueError("ber_step and max_ber must be positive.")
+
         success_history = []
         ber_history = []
         current_step = 0
         ber = 0.0
 
-        while ber + (0.01 * ber_step) <= max_ber:
-            # The (0.01 * ber_step) is to account for floating point precision. Do not remove
+        while round(ber, 10) <= max_ber:
             start_time = time.perf_counter()
             success_count = 0
-            for attempt in range(sample_size):
+
+            for _ in range(sample_size):
+                # Generate random data
                 data = np.random.randint(2, size=k)
 
-                encoded_data = bch_code.encode_bch(data)
-                error_data = introduce_error(encoded_data, ber)
+                if bch_code is not None:
+                    # BCH code scenario
+                    encoded_data = bch_code.encode_bch(data)  # Encode data
+                    error_data = introduce_error(encoded_data, ber)  # Introduce random errors
+                    decoded_data = bch_code.decode_bch(error_data)  # Decode received data
 
-                decoded_data = bch_code.decode_bch(error_data)
-                if decoded_data[0] is None:
-                    continue
-                decoded_data = decoded_data[0].tolist()[:len(data)]
+                    # Validate decoding
+                    if decoded_data[0] is not None and np.array_equal(decoded_data[0][:len(data)], data):
+                        success_count += 1
+                else:
+                    # Baseline scenario
+                    error_data = introduce_error(data, ber)  # Introduce random errors
 
-                if decoded_data == data.tolist():
-                    success_count += 1
+                    # Validate: success if no bit-flip occurred
+                    if np.array_equal(error_data, data):
+                        success_count += 1
 
-            try:
-                success_rate = success_count / sample_size
-            except ZeroDivisionError:
-                success_rate = 1.0
-
+            # Calculate success rate
+            success_rate = success_count / sample_size
             success_history.append(success_rate)
             ber_history.append(ber)
             current_step += 1
-            total_epoch_time = time.perf_counter() - start_time
+            epoch_time = time.perf_counter() - start_time
 
-            print(
-                f"Code: BCH({n},{k})\t| BER: {ber:5.3} | Epoch: {current_step:4} / {int(Max_BER / BER_step):4}"
-                f" | Success rate: {success_rate:6.4} | Time: {total_epoch_time:5.3}s")
-            ber += ber_step
+            # Print progress
+            if bch_code is not None:
+                print(
+                    f"Code: BCH({bch_code.n},{bch_code.k}) | BER: {ber:.3f} | Step: {current_step:4d} "
+                    f"| Success Rate: {success_rate:.4f} | Time: {epoch_time:.3f}s"
+                )
+            else:
+                print(
+                    f"Code: No encoding (k={k}) | BER: {ber:.3f} | Step: {current_step:4d} "
+                    f"| Success Rate: {success_rate:.4f} | Time: {epoch_time:.3f}s"
+                )
 
-            # Early stopping
-            if len(success_history) > patience_count and all(
+            # Early stopping condition
+            if len(success_history) >= patience_count and all(
                     rate <= patience_threshold for rate in success_history[-patience_count:]):
-                print("Early stopping!")
+                print("Early stopping triggered!")
                 break
 
-        return success_history, ber_history
-
-
-    def run_simulation_baseline(k, max_ber=1.0, ber_step=0.05, sample_size=100, patience_count=5,
-                                patience_threshold=0.0):
-        success_history = []
-        ber_history = []
-        current_step = 0
-        ber = 0.0
-
-        while ber + (0.01 * ber_step) <= max_ber:
-            # The (0.01 * ber_step) is to account for floating point precision. Do not remove
-            start_time = time.perf_counter()
-            success_count = 0
-            for attempt in range(sample_size):
-                data = []
-                for i in range(k):
-                    data.append(random.randint(0, 1))
-
-                error_data = introduce_error(data, ber)
-
-                if error_data == data:
-                    success_count += 1
-
-            try:
-                success_rate = success_count / sample_size
-            except ZeroDivisionError:
-                success_rate = 1.0
-
-            success_history.append(success_rate)
-            ber_history.append(ber)
-            current_step += 1
-            total_epoch_time = time.perf_counter() - start_time
-
-            print(
-                f"Code: No encoding (k={k})\t| BER: {ber:5.3} | Epoch: {current_step:4} / {int(Max_BER / BER_step):4}"
-                f" | Success rate: {success_rate:6.4} | Time: {total_epoch_time:5.3}s")
             ber += ber_step
-
-            # Early stopping
-            if len(success_history) > patience_count and all(
-                    rate <= patience_threshold for rate in success_history[-patience_count:]):
-                print("Early stopping!")
-                break
 
         return success_history, ber_history
 
@@ -137,36 +125,36 @@ if __name__ == "__main__":
     # Running simulations
     simulation_start_time = time.perf_counter()
 
-    bch127_8_success_history, bch127_8_BER_history = run_simulation(bch_code=bch127_8,
+    bch127_8_success_history, bch127_8_BER_history = run_simulation(k=bch127_8.k, bch_code=bch127_8,
                                                                     max_ber=Max_BER,
                                                                     ber_step=BER_step,
                                                                     sample_size=message_sample_size,
                                                                     patience_count=patience,
                                                                     patience_threshold=threshold)
-    bch31_6_success_history, bch31_6_BER_history = run_simulation(bch_code=bch31_6,
+    bch31_6_success_history, bch31_6_BER_history = run_simulation(k=bch31_6.k, bch_code=bch31_6,
                                                                   max_ber=Max_BER,
                                                                   ber_step=BER_step,
                                                                   sample_size=message_sample_size,
                                                                   patience_count=patience,
                                                                   patience_threshold=threshold)
-    bch15_7_success_history, bch15_7_BER_history = run_simulation(bch_code=bch15_7,
+    bch15_7_success_history, bch15_7_BER_history = run_simulation(k=bch15_7.k, bch_code=bch15_7,
                                                                   max_ber=Max_BER,
                                                                   ber_step=BER_step,
                                                                   sample_size=message_sample_size,
                                                                   patience_count=patience,
                                                                   patience_threshold=threshold)
-    bch7_4_success_history, bch7_4_BER_history = run_simulation(bch_code=bch7_4,
+    bch7_4_success_history, bch7_4_BER_history = run_simulation(k=bch7_4.k, bch_code=bch7_4,
                                                                 max_ber=Max_BER,
                                                                 ber_step=BER_step,
                                                                 sample_size=message_sample_size,
                                                                 patience_count=patience,
                                                                 patience_threshold=threshold)
-    baseline_success_history, baseline_BER_history = run_simulation_baseline(k=7,
-                                                                             max_ber=Max_BER,
-                                                                             ber_step=BER_step,
-                                                                             sample_size=message_sample_size,
-                                                                             patience_count=patience,
-                                                                             patience_threshold=threshold)
+    baseline_success_history, baseline_BER_history = run_simulation(k=7,
+                                                                    max_ber=Max_BER,
+                                                                    ber_step=BER_step,
+                                                                    sample_size=message_sample_size,
+                                                                    patience_count=patience,
+                                                                    patience_threshold=threshold)
     total_time = time.perf_counter() - simulation_start_time
     print(f"Simulation took {int(total_time // 60)} minutes and {total_time % 60:.2f} seconds")
 
