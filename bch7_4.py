@@ -114,7 +114,6 @@ if __name__ == "__main__":
     print(f"True parity bits: {true_parity_bits}")
     print("===============================")
 
-
     flipped_codeword_bits = flip_random_bits(codeword_bits, error_count)
     print(f"Errors introduced: {error_count}")
     print(f"Codeword with errors: {flipped_codeword_bits}")
