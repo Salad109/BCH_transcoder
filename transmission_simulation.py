@@ -25,7 +25,9 @@ def introduce_error(input_data, ber=0.1):
 if __name__ == "__main__":
     import bch127_8
     import bch31_6
+    import bch15_5
     import bch15_7
+    import bch15_11
     import bch7_4
     import matplotlib.pyplot as plt
     import numpy as np
@@ -118,12 +120,13 @@ if __name__ == "__main__":
     # Simulation parameters
     MAX_BER = 1.0  # Maximum bit error rate to test for(assuming it won't be terminated first by early stopping)
     BER_STEP = 0.025  # BER step value
-    SAMPLE_SIZE = 10  # How many randomized messages to send per BER value
+    SAMPLE_SIZE = 500  # How many randomized messages to send per BER value
     PATIENCE = 2  # Stop after this many epochs' success rate is smaller or equal to threshold
     THRESHOLD = 0.05
 
     # Running simulations
     simulation_start_time = time.perf_counter()
+
     bch127_8_success_history, bch127_8_BER_history = run_simulation(k=bch127_8.k, bch_code=bch127_8,
                                                                     max_ber=MAX_BER,
                                                                     ber_step=BER_STEP,
@@ -136,12 +139,24 @@ if __name__ == "__main__":
                                                                   sample_size=SAMPLE_SIZE,
                                                                   patience_count=PATIENCE,
                                                                   patience_threshold=THRESHOLD)
+    bch15_5_success_history, bch15_5_BER_history = run_simulation(k=bch15_5.k, bch_code=bch15_5,
+                                                                  max_ber=MAX_BER,
+                                                                  ber_step=BER_STEP,
+                                                                  sample_size=SAMPLE_SIZE,
+                                                                  patience_count=PATIENCE,
+                                                                  patience_threshold=THRESHOLD)
     bch15_7_success_history, bch15_7_BER_history = run_simulation(k=bch15_7.k, bch_code=bch15_7,
                                                                   max_ber=MAX_BER,
                                                                   ber_step=BER_STEP,
                                                                   sample_size=SAMPLE_SIZE,
                                                                   patience_count=PATIENCE,
                                                                   patience_threshold=THRESHOLD)
+    bch15_11_success_history, bch15_11_BER_history = run_simulation(k=bch15_11.k, bch_code=bch15_11,
+                                                                    max_ber=MAX_BER,
+                                                                    ber_step=BER_STEP,
+                                                                    sample_size=SAMPLE_SIZE,
+                                                                    patience_count=PATIENCE,
+                                                                    patience_threshold=THRESHOLD)
     bch7_4_success_history, bch7_4_BER_history = run_simulation(k=bch7_4.k, bch_code=bch7_4,
                                                                 max_ber=MAX_BER,
                                                                 ber_step=BER_STEP,
@@ -154,17 +169,22 @@ if __name__ == "__main__":
                                                                     sample_size=SAMPLE_SIZE,
                                                                     patience_count=PATIENCE,
                                                                     patience_threshold=THRESHOLD)
+
     total_time = time.perf_counter() - simulation_start_time
     print(f"Simulation took {int(total_time // 60)} minutes and {total_time % 60:.2f} seconds")
 
-    # Plotting
+    # Plotting Success Rate vs BER
     plt.figure(figsize=(10, 6))
     plt.plot(bch127_8_BER_history, bch127_8_success_history, color='purple', linestyle='-', linewidth=2,
              label='BCH(127,8), t=31')
     plt.plot(bch31_6_BER_history, bch31_6_success_history, color='red', linestyle='-', linewidth=2,
              label='BCH(31,6), t=7')
-    plt.plot(bch15_7_BER_history, bch15_7_success_history, color='lawngreen', linestyle='-', linewidth=2,
+    plt.plot(bch15_5_BER_history, bch15_5_success_history, color='green', linestyle='-', linewidth=2,
+             label='BCH(15,5), t=3')
+    plt.plot(bch15_7_BER_history, bch15_7_success_history, color='green', linestyle='--', linewidth=2,
              label='BCH(15,7), t=2')
+    plt.plot(bch15_11_BER_history, bch15_11_success_history, color='green', linestyle=':', linewidth=2,
+             label='BCH(15,11), t=1')
     plt.plot(bch7_4_BER_history, bch7_4_success_history, color='blue', linestyle='-', linewidth=2,
              label='BCH(7,4), t=1')
     plt.plot(baseline_BER_history, baseline_success_history, color='black', linestyle='--', linewidth=2,
@@ -182,6 +202,7 @@ if __name__ == "__main__":
     plt.savefig('success_rate_plot.svg', format='svg')
     plt.show()
 
+
     # Transmission speed calculations
     def get_effective_transmission_speed(bch_code, success_history):
         data_ratio = bch_code.k / bch_code.n
@@ -193,7 +214,9 @@ if __name__ == "__main__":
 
     bch127_8_speed = get_effective_transmission_speed(bch127_8, bch127_8_success_history)
     bch31_6_speed = get_effective_transmission_speed(bch31_6, bch31_6_success_history)
+    bch15_5_speed = get_effective_transmission_speed(bch15_5, bch15_5_success_history)
     bch15_7_speed = get_effective_transmission_speed(bch15_7, bch15_7_success_history)
+    bch15_11_speed = get_effective_transmission_speed(bch15_11, bch15_11_success_history)
     bch_7_4_speed = get_effective_transmission_speed(bch7_4, bch7_4_success_history)
     baseline_speed = baseline_success_history
 
@@ -202,8 +225,12 @@ if __name__ == "__main__":
              label='BCH(127,8), t=31')
     plt.plot(bch31_6_BER_history, bch31_6_speed, color='red', linestyle='-', linewidth=2,
              label='BCH(31,6), t=7')
-    plt.plot(bch15_7_BER_history, bch15_7_speed, color='lawngreen', linestyle='-', linewidth=2,
+    plt.plot(bch15_5_BER_history, bch15_5_speed, color='green', linestyle='-', linewidth=2,
+             label='BCH(15,5), t=3')
+    plt.plot(bch15_7_BER_history, bch15_7_speed, color='green', linestyle='--', linewidth=2,
              label='BCH(15,7), t=2')
+    plt.plot(bch15_11_BER_history, bch15_11_speed, color='green', linestyle=':', linewidth=2,
+             label='BCH(15,11), t=1')
     plt.plot(bch7_4_BER_history, bch_7_4_speed, color='blue', linestyle='-', linewidth=2,
              label='BCH(7,4), t=1')
     plt.plot(baseline_BER_history, baseline_speed, color='black', linestyle='--', linewidth=2,

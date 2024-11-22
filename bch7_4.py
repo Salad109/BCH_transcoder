@@ -5,11 +5,11 @@ from transmission_simulation import flip_random_bits
 n = 7
 k = 4
 t = 1
+generator = [1, 0, 1, 1]  # BCH generator polynomial
 
 
 def encode_bch(data, output="codeword"):
     field = galois.GF(2)
-    generator = [1, 0, 1, 1]
     data_poly = galois.Poly(data, field=field)
     generator_poly = galois.Poly(generator, field=field)
 
@@ -50,7 +50,6 @@ def true_encode_bch(data, output="codeword"):
 
 def decode_bch(codeword, t=1):
     field = galois.GF(2)
-    generator = [1, 0, 1, 1]
     codeword_poly = galois.Poly(codeword, field=field)
     generator_poly = galois.Poly(generator, field=field)
     max_shifts = len(codeword)  # maximum number of cyclic shifts
