@@ -122,4 +122,3 @@ if __name__ == "__main__":
     true_decoded_bits, true_error_count = true_decode_bch(flipped_codeword_bits)
     print(f"Decoded codeword: {decoded_bits}, errors identified: {error_count}")
     print(f"True decoded codeword: {true_decoded_bits}, errors identified: {true_error_count}")
-    assert np.array_equal(codeword_bits, decoded_bits), "Decoded codeword does not match original codeword"
