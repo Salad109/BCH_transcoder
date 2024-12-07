@@ -8,7 +8,7 @@ t = 1
 generator = [1, 0, 1, 1]  # BCH generator polynomial
 
 
-def encode_bch(data, output="codeword"):
+def encode(data, output="codeword"):
     field = galois.GF(2)
     data_poly = galois.Poly(data, field=field)
     generator_poly = galois.Poly(generator, field=field)
@@ -36,7 +36,7 @@ def encode_bch(data, output="codeword"):
         return codeword_coeffs, generator_coeffs, parity_coeffs
 
 
-def true_encode_bch(data, output="codeword"):
+def true_encode(data, output="codeword"):
     field = galois.GF(2)
     bch_code = galois.BCH(n=n, k=k, field=field)
     generator_poly = bch_code.generator_poly.coeffs
@@ -48,7 +48,7 @@ def true_encode_bch(data, output="codeword"):
         return codeword_poly, generator_poly, parity_poly
 
 
-def decode_bch(codeword, t=1):
+def decode(codeword, t=1):
     field = galois.GF(2)
     codeword_poly = galois.Poly(codeword, field=field)
     generator_poly = galois.Poly(generator, field=field)
@@ -90,7 +90,7 @@ def decode_bch(codeword, t=1):
     return None, None
 
 
-def true_decode_bch(input_data):
+def true_decode(input_data):
     field = galois.GF(2)
     bch_code = galois.BCH(n=n, k=k, field=field)
     decoded_codeword, errors = bch_code.decode(input_data, output="codeword", errors=True)
@@ -102,12 +102,12 @@ if __name__ == "__main__":
     data = [0, 1, 0, 1]
     error_count = t
 
-    codeword_bits, generator_bits, parity_bits = encode_bch(data, output="all")
+    codeword_bits, generator_bits, parity_bits = encode(data, output="all")
     print(f"Codeword: {codeword_bits}")
     print(f"Generator: {generator_bits}")
     print(f"Parity bits: {parity_bits}")
     print("-------------------------------")
-    true_codeword_bits, true_generator_bits, true_parity_bits = true_encode_bch(data, output="all")
+    true_codeword_bits, true_generator_bits, true_parity_bits = true_encode(data, output="all")
     print(f"True codeword: {true_codeword_bits}")
     print(f"True generator: {true_generator_bits}")
     print(f"True parity bits: {true_parity_bits}")
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     print(f"Codeword with errors: {flipped_codeword_bits}")
     print("===============================")
 
-    decoded_bits, error_count = decode_bch(flipped_codeword_bits, t)
-    true_decoded_bits, true_error_count = true_decode_bch(flipped_codeword_bits)
+    decoded_bits, error_count = decode(flipped_codeword_bits, t)
+    true_decoded_bits, true_error_count = true_decode(flipped_codeword_bits)
     print(f"Decoded codeword: {decoded_bits}, errors identified: {error_count}")
     print(f"True decoded codeword: {true_decoded_bits}, errors identified: {true_error_count}")

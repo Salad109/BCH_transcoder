@@ -72,9 +72,9 @@ if __name__ == "__main__":
 
                 if bch_code is not None:
                     # BCH code scenario
-                    encoded_data = bch_code.encode_bch(data)  # Encode data
+                    encoded_data = bch_code.encode(data)  # Encode data
                     error_data = introduce_error(encoded_data, ber)  # Introduce random errors
-                    decoded_data = bch_code.decode_bch(error_data)  # Decode received data
+                    decoded_data = bch_code.decode(error_data)  # Decode received data
 
                     # Validate decoding
                     if decoded_data[0] is not None and np.array_equal(decoded_data[0][:len(data)], data):
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     BER_STEP = 0.05  # BER step value
     SAMPLE_SIZE = 250  # How many randomized messages to send per BER value
     PATIENCE = 3  # Stop after this many epochs' success rate is smaller or equal to threshold
-    THRESHOLD = 0.005
+    THRESHOLD = 0.1
 
     # Running simulations
     simulation_start_time = time.perf_counter()

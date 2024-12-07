@@ -32,19 +32,19 @@ class TestBCH127_8(unittest.TestCase):
                          [1, 1, 1, 1, 1, 1, 1, 1],
                          [1, 0, 1, 0, 1, 0, 1, 0]]
 
-    def test_bch_encoding(self):
+    def test_encoding(self):
         for test in self.data:
             with self.subTest(test=test):
-                true_encoded_data = bch127_8.true_encode_bch(test, "codeword")
-                our_encoded_data = bch127_8.encode_bch(test, "codeword")
+                true_encoded_data = bch127_8.true_encode(test, "codeword")
+                our_encoded_data = bch127_8.encode(test, "codeword")
                 self.assertTrue(np.array_equal(our_encoded_data, true_encoded_data),
                                 f"Encoding does not match for input {test}")
 
-    def test_bch_decoding(self):
+    def test_decoding(self):
         for bad_code, message in zip(self.bad_codes, self.messages):
             with self.subTest(bad_code=bad_code, message=message):
-                true_decoded_data = bch127_8.true_decode_bch(bad_code)[0][:bch127_8.k].tolist()
-                decoded_data = bch127_8.decode_bch(bad_code)[0][:bch127_8.k].tolist()
+                true_decoded_data = bch127_8.true_decode(bad_code)[0][:bch127_8.k].tolist()
+                decoded_data = bch127_8.decode(bad_code)[0][:bch127_8.k].tolist()
                 self.assertTrue(np.array_equal(decoded_data[:len(message)], message),
                                 f"Bad decoding for input {bad_code}")
                 self.assertTrue(np.array_equal(true_decoded_data, decoded_data),
