@@ -1,6 +1,5 @@
 import galois
 import numpy as np
-from transmission_simulation import flip_random_bits
 
 n = 15
 k = 5
@@ -41,9 +40,9 @@ def true_encode(data, output="codeword"):
     generator_poly = bch_code.generator_poly.coeffs
     parity_poly = bch_code.encode(data, output="parity")
     codeword_poly = bch_code.encode(data, output="codeword")
-    if (output == "codeword"):
+    if output == "codeword":
         return codeword_poly
-    elif (output == "all"):
+    elif output == "all":
         return codeword_poly, generator_poly, parity_poly
 
 
@@ -98,22 +97,67 @@ def true_decode(input_data):
 
 # ============================
 if __name__ == "__main__":
-    data = [1, 0, 1, 0, 1]
-    error_count = t
+    from transmission_simulation import flip_random_bits, introduce_error
+
+    while True:
+        print("Choose the error method:")
+        print("1. Fixed number of errors")
+        print("2. Probability of error(BER)")
+        choice = input("Enter your choice (1 or 2): ")
+
+        if choice in ('1', '2'):
+            break
+        print("Invalid method. Please enter 1 or 2.")
+
+    # Step 1: Get a string of bits from the user
+    while True:
+        bit_string = input(f"Enter a string of {k} bits (0 and 1 only): ")
+        if len(bit_string) == k and all(char in '01' for char in bit_string):
+            break
+        print(f"Invalid input. Ensure the string is {k} characters long and contains only 0 and 1.")
+
+    # Convert bit string to an array of integers
+    data = [int(bit) for bit in bit_string]
+
+    if choice == '1':
+        # Step 2a: Get an integer between 0 and t
+        while True:
+            try:
+                error_count = int(input(f"Enter the error amount(an integer between 0 and {n}): "))
+                if 0 <= error_count <= n:
+                    break
+                else:
+                    print(f"Invalid input. The number must be between 0 and {n}.")
+            except ValueError:
+                print("Invalid input. Please enter a valid integer.")
+
+
+    elif choice == '2':
+        # Step 2b: Get a double between 0 and 1
+        while True:
+            try:
+                ber = float(input("Enter the bit error rate(a double between 0 and 1): "))
+                if 0.0 <= ber <= 1.0:
+                    break
+                else:
+                    print("Invalid input. The number must be between 0 and 1.")
+            except ValueError:
+                print("Invalid input. Please enter a valid double.")
+
 
     codeword_bits, generator_bits, parity_bits = encode(data, output="all")
     print(f"Codeword: {codeword_bits}")
-    print(f"Generator: {generator_bits}")
-    print(f"Parity bits: {parity_bits}")
     print("-------------------------------")
     true_codeword_bits, true_generator_bits, true_parity_bits = true_encode(data, output="all")
     print(f"True codeword: {true_codeword_bits}")
-    print(f"True generator: {true_generator_bits}")
-    print(f"True parity bits: {true_parity_bits}")
     print("===============================")
 
-    flipped_codeword_bits = flip_random_bits(codeword_bits, error_count)
+    if choice == '1':
+        flipped_codeword_bits = flip_random_bits(codeword_bits, error_count)
     print(f"Errors introduced: {error_count}")
+    if choice == '2':
+        flipped_codeword_bits = introduce_error(codeword_bits, ber)
+
     print(f"Codeword with errors: {flipped_codeword_bits}")
     print("===============================")
 
@@ -121,3 +165,8 @@ if __name__ == "__main__":
     true_decoded_bits, true_error_count = true_decode(flipped_codeword_bits)
     print(f"Decoded codeword: {decoded_bits}, errors identified: {error_count}")
     print(f"True decoded codeword: {true_decoded_bits}, errors identified: {true_error_count}")
+
+    if decoded_bits.all() == true_decoded_bits.all():
+        print("Decoding successful")
+    else:
+        print("Decoding failed")

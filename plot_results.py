@@ -60,6 +60,7 @@ plt.legend(loc="upper right", prop={'size': 15})
 plt.tight_layout()
 
 plt.savefig('success_plot_all.svg', format='svg')
+print("Success plot saved as success_plot_all.svg")
 plt.show()
 
 # Plotting code rate
@@ -89,6 +90,7 @@ plt.legend(loc="upper right", prop={'size': 15})
 plt.tight_layout()
 
 plt.savefig('rate_plot_all.svg', format='svg')
+print("Rate plot saved as rate_plot_all.svg")
 plt.show()
 
 # Plotting BCH(15,x) success rates standalone
@@ -110,6 +112,7 @@ plt.legend(loc="upper right", prop={'size': 15})
 plt.tight_layout()
 
 plt.savefig('success_plot_bch15.svg', format='svg')
+print("Success plot saved as success_plot_bch15.svg")
 plt.show()
 
 # Plotting BCH(15,x) code rate standalone
@@ -131,4 +134,5 @@ plt.legend(loc="upper right", prop={'size': 15})
 plt.tight_layout()
 
 plt.savefig('rate_plot_bch15.svg', format='svg')
+print("Rate plot saved as rate_plot_bch15.svg")
 plt.show()

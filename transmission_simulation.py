@@ -29,9 +29,19 @@ if __name__ == "__main__":
     import bch15_7
     import bch15_11
     import bch7_4
-    import matplotlib.pyplot as plt
     import numpy as np
     import time
+    import csv
+
+    # Simulation parameters
+    MAX_BER = 1.0  # Maximum bit error rate to test for(assuming it won't be terminated first by early stopping)
+    BER_STEP = 0.075  # BER step value
+    SAMPLE_SIZE = 150  # How many randomized messages to send per BER value
+    PATIENCE = 2  # Stop after this many epochs' success rate is smaller or equal to threshold
+    THRESHOLD = 0.01
+
+    if MAX_BER <= 0 or BER_STEP <= 0 or SAMPLE_SIZE <= 0 or PATIENCE <= 0 or THRESHOLD < 0:
+        raise ValueError("Simulation parameters must be positive.")
 
 
     def run_simulation(k, bch_code=None, max_ber=1.0, ber_step=0.05, sample_size=100, patience_count=5,
@@ -117,64 +127,82 @@ if __name__ == "__main__":
         return success_history, ber_history
 
 
-    # Simulation parameters
-    MAX_BER = 1.0  # Maximum bit error rate to test for(assuming it won't be terminated first by early stopping)
-    BER_STEP = 0.05  # BER step value
-    SAMPLE_SIZE = 250  # How many randomized messages to send per BER value
-    PATIENCE = 3  # Stop after this many epochs' success rate is smaller or equal to threshold
-    THRESHOLD = 0.1
-
     # Running simulations
+    print("The simulation may take several minutes to complete. Please be patient.")
     simulation_start_time = time.perf_counter()
 
-    bch127_8_success_history, bch127_8_BER_history = run_simulation(k=bch127_8.k, bch_code=bch127_8,
+    bch127_8_success_history, bch127_8_ber_history = run_simulation(k=bch127_8.k, bch_code=bch127_8,
                                                                     max_ber=MAX_BER,
                                                                     ber_step=BER_STEP,
                                                                     sample_size=SAMPLE_SIZE,
                                                                     patience_count=PATIENCE,
                                                                     patience_threshold=THRESHOLD)
-    bch31_6_success_history, bch31_6_BER_history = run_simulation(k=bch31_6.k, bch_code=bch31_6,
+    bch31_6_success_history, bch31_6_ber_history = run_simulation(k=bch31_6.k, bch_code=bch31_6,
                                                                   max_ber=MAX_BER,
                                                                   ber_step=BER_STEP,
                                                                   sample_size=SAMPLE_SIZE,
                                                                   patience_count=PATIENCE,
                                                                   patience_threshold=THRESHOLD)
-    bch15_5_success_history, bch15_5_BER_history = run_simulation(k=bch15_5.k, bch_code=bch15_5,
+    bch15_5_success_history, bch15_5_ber_history = run_simulation(k=bch15_5.k, bch_code=bch15_5,
                                                                   max_ber=MAX_BER,
                                                                   ber_step=BER_STEP,
                                                                   sample_size=SAMPLE_SIZE,
                                                                   patience_count=PATIENCE,
                                                                   patience_threshold=THRESHOLD)
-    bch15_7_success_history, bch15_7_BER_history = run_simulation(k=bch15_7.k, bch_code=bch15_7,
+    bch15_7_success_history, bch15_7_ber_history = run_simulation(k=bch15_7.k, bch_code=bch15_7,
                                                                   max_ber=MAX_BER,
                                                                   ber_step=BER_STEP,
                                                                   sample_size=SAMPLE_SIZE,
                                                                   patience_count=PATIENCE,
                                                                   patience_threshold=THRESHOLD)
-    bch15_11_success_history, bch15_11_BER_history = run_simulation(k=bch15_11.k, bch_code=bch15_11,
+    bch15_11_success_history, bch15_11_ber_history = run_simulation(k=bch15_11.k, bch_code=bch15_11,
                                                                     max_ber=MAX_BER,
                                                                     ber_step=BER_STEP,
                                                                     sample_size=SAMPLE_SIZE,
                                                                     patience_count=PATIENCE,
                                                                     patience_threshold=THRESHOLD)
-    bch7_4_success_history, bch7_4_BER_history = run_simulation(k=bch7_4.k, bch_code=bch7_4,
+    bch7_4_success_history, bch7_4_ber_history = run_simulation(k=bch7_4.k, bch_code=bch7_4,
                                                                 max_ber=MAX_BER,
                                                                 ber_step=BER_STEP,
                                                                 sample_size=SAMPLE_SIZE,
                                                                 patience_count=PATIENCE,
                                                                 patience_threshold=THRESHOLD)
-    baseline_15_success_history, baseline_15_BER_history = run_simulation(k=15,
+    baseline_15_success_history, baseline_15_ber_history = run_simulation(k=15,
+                                                                          max_ber=MAX_BER,
+                                                                          ber_step=BER_STEP,
+                                                                          sample_size=SAMPLE_SIZE,
+                                                                          patience_count=PATIENCE,
+                                                                          patience_threshold=THRESHOLD)
+    baseline_7_success_history, baseline_7_ber_history = run_simulation(k=7,
                                                                         max_ber=MAX_BER,
                                                                         ber_step=BER_STEP,
                                                                         sample_size=SAMPLE_SIZE,
                                                                         patience_count=PATIENCE,
                                                                         patience_threshold=THRESHOLD)
-    baseline_7_success_history, baseline_7_BER_history = run_simulation(k=7,
-                                                                        max_ber=MAX_BER,
-                                                                        ber_step=BER_STEP,
-                                                                        sample_size=SAMPLE_SIZE,
-                                                                        patience_count=PATIENCE,
-                                                                        patience_threshold=THRESHOLD)
+
+    # Determine the maximum length of the success rate lists
+    max_length = max(len(bch127_8_success_history), len(bch31_6_success_history), len(bch15_5_success_history),
+                     len(bch15_7_success_history), len(bch15_11_success_history), len(bch7_4_success_history),
+                     len(baseline_15_success_history), len(baseline_7_success_history))
+
+    BER_history = max([bch127_8_ber_history, bch31_6_ber_history, bch15_5_ber_history, bch15_7_ber_history,
+                       bch15_11_ber_history, bch7_4_ber_history, baseline_15_ber_history, baseline_7_ber_history],
+                      key=len)
+
+
+    # Pad shorter lists with zeros
+    def pad_list(lst, length):
+        return lst + [0] * (length - len(lst))
+
+
+    bch127_8_success_history = pad_list(bch127_8_success_history, max_length)
+    bch31_6_success_history = pad_list(bch31_6_success_history, max_length)
+    bch15_5_success_history = pad_list(bch15_5_success_history, max_length)
+    bch15_7_success_history = pad_list(bch15_7_success_history, max_length)
+    bch15_11_success_history = pad_list(bch15_11_success_history, max_length)
+    bch7_4_success_history = pad_list(bch7_4_success_history, max_length)
+    baseline_15_success_history = pad_list(baseline_15_success_history, max_length)
+    baseline_7_success_history = pad_list(baseline_7_success_history, max_length)
 
 
     # Code rate calculations
@@ -198,114 +226,28 @@ if __name__ == "__main__":
     total_time = time.perf_counter() - simulation_start_time
     print(f"Simulation took {int(total_time // 60)} minutes and {total_time % 60:.2f} seconds")
 
-    # Plotting Success Rate vs BER
-    plt.figure(figsize=(10, 6))
-    plt.plot(bch127_8_BER_history, bch127_8_success_history, color='purple', linestyle='-', linewidth=2,
-             label='BCH(127,8), t=31')
-    plt.plot(bch31_6_BER_history, bch31_6_success_history, color='red', linestyle='-', linewidth=2,
-             label='BCH(31,6), t=7')
-    plt.plot(bch15_5_BER_history, bch15_5_success_history, color='green', linestyle='-', linewidth=2,
-             label='BCH(15,5), t=3')
-    plt.plot(bch15_7_BER_history, bch15_7_success_history, color='green', linestyle='--', linewidth=2,
-             label='BCH(15,7), t=2')
-    plt.plot(bch15_11_BER_history, bch15_11_success_history, color='green', linestyle=':', linewidth=2,
-             label='BCH(15,11), t=1')
-    plt.plot(bch7_4_BER_history, bch7_4_success_history, color='blue', linestyle='-', linewidth=2,
-             label='BCH(7,4), t=1')
-    plt.plot(baseline_15_BER_history, baseline_15_success_history, color='black', linestyle='--', linewidth=2,
-             label='No encoding(k=15), t=0')
-    plt.plot(baseline_7_BER_history, baseline_7_success_history, color='black', linestyle=':', linewidth=2,
-             label='No encoding(k=7), t=0')
+    # Write the success rate data to a CSV file
+    with open('success_results.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(
+            ['BER', 'BCH(127,8)', 'BCH(31,6)', 'BCH(15,5)', 'BCH(15,7)', 'BCH(15,11)', 'BCH(7,4)', 'No encoding (k=15)',
+             'No encoding (k=7)'])
+        for i in range(max_length):
+            writer.writerow(
+                [BER_history[i], bch127_8_success_history[i], bch31_6_success_history[i], bch15_5_success_history[i],
+                 bch15_7_success_history[i], bch15_11_success_history[i], bch7_4_success_history[i],
+                 baseline_15_success_history[i], baseline_7_success_history[i]])
 
-    plt.title("Success Rate vs. BER for various BCH Codes", fontsize=20, fontweight='bold')
-    plt.xlabel("Bit Error Rate (BER)", fontsize=12)
-    plt.ylabel("Success Rate", fontsize=12)
-    plt.grid(True, linestyle='--', linewidth=0.5)
-    plt.legend(loc="upper right", prop={'size': 15})
-    plt.tight_layout()
+    # Write the effective code rate data to a CSV file
+    with open('rate_results.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(
+            ['BER', 'BCH(127,8)', 'BCH(31,6)', 'BCH(15,5)', 'BCH(15,7)', 'BCH(15,11)', 'BCH(7,4)', 'No encoding (k=15)',
+             'No encoding (k=7)'])
+        for i in range(max_length):
+            writer.writerow(
+                [BER_history[i], bch127_8_rate[i], bch31_6_rate[i], bch15_5_rate[i],
+                 bch15_7_rate[i], bch15_11_rate[i], bch_7_4_rate[i],
+                 baseline_15_rate[i], baseline_7_rate[i]])
 
-    text = f"BER step: {BER_STEP}\nMessages per step per code: {SAMPLE_SIZE}"
-    plt.annotate(text, (0, 0), (0, -20), xycoords='axes fraction', textcoords='offset points', va='top')
-
-    plt.savefig('success_plot_all.svg', format='svg')
-    plt.show()
-
-    # Plotting code rate
-    plt.figure(figsize=(10, 6))
-    plt.plot(bch127_8_BER_history, bch127_8_rate, color='purple', linestyle='-', linewidth=2,
-             label='BCH(127,8), t=31')
-    plt.plot(bch31_6_BER_history, bch31_6_rate, color='red', linestyle='-', linewidth=2,
-             label='BCH(31,6), t=7')
-    plt.plot(bch15_5_BER_history, bch15_5_rate, color='green', linestyle='-', linewidth=2,
-             label='BCH(15,5), t=3')
-    plt.plot(bch15_7_BER_history, bch15_7_rate, color='green', linestyle='--', linewidth=2,
-             label='BCH(15,7), t=2')
-    plt.plot(bch15_11_BER_history, bch15_11_rate, color='green', linestyle=':', linewidth=2,
-             label='BCH(15,11), t=1')
-    plt.plot(bch7_4_BER_history, bch_7_4_rate, color='blue', linestyle='-', linewidth=2,
-             label='BCH(7,4), t=1')
-    plt.plot(baseline_15_BER_history, baseline_15_rate, color='black', linestyle='--', linewidth=2,
-             label='No encoding(k=15), t=0')
-    plt.plot(baseline_7_BER_history, baseline_7_rate, color='black', linestyle=':', linewidth=2,
-             label='No encoding(k=7), t=0')
-
-    plt.title("Effective code rate vs. BER for various BCH Codes", fontsize=20, fontweight='bold')
-    plt.xlabel("Bit Error Rate (BER)", fontsize=12)
-    plt.ylabel("Effective code rate", fontsize=12)
-    plt.grid(True, linestyle='--', linewidth=0.5)
-    plt.legend(loc="upper right", prop={'size': 15})
-    plt.tight_layout()
-
-    text = f"BER step: {BER_STEP}\nMessages per step per code: {SAMPLE_SIZE}"
-    plt.annotate(text, (0, 0), (0, -20), xycoords='axes fraction', textcoords='offset points', va='top')
-
-    plt.savefig('rate_plot_all.svg', format='svg')
-    plt.show()
-
-    # Plotting BCH(15,x) success rates standalone
-    plt.figure(figsize=(10, 6))
-    plt.plot(bch15_5_BER_history, bch15_5_success_history, color='green', linestyle='-', linewidth=2,
-             label='BCH(15,5), t=3')
-    plt.plot(bch15_7_BER_history, bch15_7_success_history, color='green', linestyle='--', linewidth=2,
-             label='BCH(15,7), t=2')
-    plt.plot(bch15_11_BER_history, bch15_11_success_history, color='green', linestyle=':', linewidth=2,
-             label='BCH(15,11), t=1')
-    plt.plot(baseline_15_BER_history, baseline_15_success_history, color='black', linestyle='--', linewidth=2,
-             label='No encoding(k=15), t=0')
-
-    plt.title("Success Rate vs. BER for BCH(15,x) codes", fontsize=20, fontweight='bold')
-    plt.xlabel("Bit Error Rate (BER)", fontsize=12)
-    plt.ylabel("Success Rate", fontsize=12)
-    plt.grid(True, linestyle='--', linewidth=0.5)
-    plt.legend(loc="upper right", prop={'size': 15})
-    plt.tight_layout()
-
-    text = f"BER step: {BER_STEP}\nMessages per step per code: {SAMPLE_SIZE}"
-    plt.annotate(text, (0, 0), (0, -20), xycoords='axes fraction', textcoords='offset points', va='top')
-
-    plt.savefig('success_plot_bch15.svg', format='svg')
-    plt.show()
-
-    # Plotting BCH(15,x) code rate standalone
-    plt.figure(figsize=(10, 6))
-    plt.plot(bch15_5_BER_history, bch15_5_rate, color='green', linestyle='-', linewidth=2,
-             label='BCH(15,5), t=3')
-    plt.plot(bch15_7_BER_history, bch15_7_rate, color='green', linestyle='--', linewidth=2,
-             label='BCH(15,7), t=2')
-    plt.plot(bch15_11_BER_history, bch15_11_rate, color='green', linestyle=':', linewidth=2,
-             label='BCH(15,11), t=1')
-    plt.plot(baseline_15_BER_history, baseline_15_rate, color='black', linestyle='--', linewidth=2,
-             label='No encoding(k=15), t=0')
-
-    plt.title("Effective code rate vs. BER for BCH(15,x) codes", fontsize=20, fontweight='bold')
-    plt.xlabel("Bit Error Rate (BER)", fontsize=12)
-    plt.ylabel("Effective code rate", fontsize=12)
-    plt.grid(True, linestyle='--', linewidth=0.5)
-    plt.legend(loc="upper right", prop={'size': 15})
-    plt.tight_layout()
-
-    text = f"BER step: {BER_STEP}\nMessages per step per code: {SAMPLE_SIZE}"
-    plt.annotate(text, (0, 0), (0, -20), xycoords='axes fraction', textcoords='offset points', va='top')
-
-    plt.savefig('rate_plot_bch15.svg', format='svg')
-    plt.show()
+    print("Results saved to CSV files. Run plot_results.py to generate plots.")
