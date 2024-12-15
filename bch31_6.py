@@ -48,7 +48,7 @@ def true_encode(data, output="codeword"):
         return codeword_poly, generator_poly, parity_poly
 
 
-def decode(codeword, t=7):
+def decode(codeword):
     field = galois.GF(2)
     codeword_poly = galois.Poly(codeword, field=field)
     generator_poly = galois.Poly(generator, field=field)
@@ -90,10 +90,10 @@ def decode(codeword, t=7):
     return None, None
 
 
-def true_decode(input_data):
+def true_decode(codeword):
     field = galois.GF(2)
     bch_code = galois.BCH(n=n, k=k, field=field)
-    decoded_codeword, errors = bch_code.decode(input_data, output="codeword", errors=True)
+    decoded_codeword, errors = bch_code.decode(codeword, output="codeword", errors=True)
     return decoded_codeword, errors
 
 
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     print(f"Codeword with errors: {flipped_codeword_bits}")
     print("===============================")
 
-    decoded_bits, error_count = decode(flipped_codeword_bits, t)
+    decoded_bits, error_count = decode(flipped_codeword_bits)
     true_decoded_bits, true_error_count = true_decode(flipped_codeword_bits)
     print(f"Decoded codeword: {decoded_bits}, errors identified: {error_count}")
     print(f"True decoded codeword: {true_decoded_bits}, errors identified: {true_error_count}")
