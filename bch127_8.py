@@ -125,6 +125,9 @@ if __name__ == "__main__":
     # Convert bit string to an array of integers
     data = [int(bit) for bit in bit_string]
 
+    codeword_bits, generator_bits, parity_bits = encode(data, output="all")
+    print(f"Codeword: {codeword_bits}")
+
     if choice == '1':
         # Step 2a: Get an integer between 0 and t
         while True:
@@ -137,6 +140,8 @@ if __name__ == "__main__":
             except ValueError:
                 print("Invalid input. Please enter a valid integer.")
 
+        flipped_codeword_bits = flip_random_bits(codeword_bits, error_count)
+        print(f"Errors introduced: {error_count}")
 
     elif choice == '2':
         # Step 2b: Get a double between 0 and 1
@@ -150,19 +155,13 @@ if __name__ == "__main__":
             except ValueError:
                 print("Invalid input. Please enter a valid double.")
 
+        flipped_codeword_bits = introduce_error(codeword_bits, ber)
+        print(f"Errors introduced: {ber}")
 
-    codeword_bits, generator_bits, parity_bits = encode(data, output="all")
-    print(f"Codeword: {codeword_bits}")
     print("-------------------------------")
     true_codeword_bits, true_generator_bits, true_parity_bits = true_encode(data, output="all")
     print(f"True codeword: {true_codeword_bits}")
     print("===============================")
-
-    if choice == '1':
-        flipped_codeword_bits = flip_random_bits(codeword_bits, error_count)
-    print(f"Errors introduced: {error_count}")
-    if choice == '2':
-        flipped_codeword_bits = introduce_error(codeword_bits, ber)
 
     print(f"Codeword with errors: {flipped_codeword_bits}")
     print("===============================")
@@ -172,7 +171,7 @@ if __name__ == "__main__":
     print(f"Decoded codeword: {decoded_bits}, errors identified: {error_count}")
     print(f"True decoded codeword: {true_decoded_bits}, errors identified: {true_error_count}")
 
-    if decoded_bits.all() == true_decoded_bits.all():
+    if np.array_equal(decoded_bits, true_decoded_bits):
         print("Decoding successful")
     else:
         print("Decoding failed")
