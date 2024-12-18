@@ -1,0 +1,15 @@
+contourpy
+cycler
+fonttools
+galois
+kiwisolver
+llvmlite
+matplotlib
+numba
+numpy
+packaging
+pillow
+pyparsing
+python-dateutil
+six
+typing_extensions
