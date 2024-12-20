@@ -52,8 +52,8 @@ This project simulates BCH (Bose-Chaudhuri-Hocquenghem) error-correcting codes, 
 
 ## Usage Guide
 
-### 1. Generate BCH Codes  
-Run one of the provided BCH code scripts to generate error-correcting codes. For example:
+### 1. Explore individual BCH Codes  
+Run one of the provided BCH code scripts to see how they handle the error-correcting process. For example:
 ```bash
 python bch7_4.py
 ```

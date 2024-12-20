@@ -37,8 +37,8 @@ if __name__ == "__main__":
     MAX_BER = 1.0  # Maximum bit error rate to test for(assuming it won't be terminated first by early stopping)
     BER_STEP = 0.075  # BER step value
     SAMPLE_SIZE = 150  # How many randomized messages to send per BER value
-    PATIENCE = 2  # Stop after this many epochs' success rate is smaller or equal to threshold
-    THRESHOLD = 0.01
+    PATIENCE = 3  # Stop after this many epochs' success rate is smaller or equal to threshold
+    THRESHOLD = 0.075 # Stop if success rate is smaller or equal to this value
 
     if MAX_BER <= 0 or BER_STEP <= 0 or SAMPLE_SIZE <= 0 or PATIENCE <= 0 or THRESHOLD < 0:
         raise ValueError("Simulation parameters must be positive.")
@@ -128,7 +128,21 @@ if __name__ == "__main__":
 
 
     # Running simulations
+    bch127_8 = bch127_8.BCH127_8()
+    bch31_6 = bch31_6.BCH31_6()
+    bch15_5 = bch15_5.BCH15_5()
+    bch15_7 = bch15_7.BCH15_7()
+    bch15_11 = bch15_11.BCH15_11()
+    bch7_4 = bch7_4.BCH7_4()
+
+    print("Commencing simulation with the following parameters:")
+    print(f"Max BER: {MAX_BER}")
+    print(f"BER step: {BER_STEP}")
+    print(f"Sample size: {SAMPLE_SIZE}")
+    print(f"Patience: {PATIENCE}")
+    print(f"Patience threshold: {THRESHOLD}")
     print("The simulation may take several minutes to complete. Please be patient.")
+
     simulation_start_time = time.perf_counter()
 
     bch127_8_success_history, bch127_8_ber_history = run_simulation(k=bch127_8.k, bch_code=bch127_8,

@@ -13,7 +13,7 @@ class TestBCH7_4(unittest.TestCase):
     def test_encoding(self):
         for test in self.data:
             with self.subTest(test=test):
-                true_encoded_data = bch7_4.true_encode(test, "codeword")
+                true_encoded_data = bch7_4.validation_encode(test, "codeword")
                 our_encoded_data = bch7_4.encode(test, "codeword")
                 self.assertTrue(np.array_equal(our_encoded_data, true_encoded_data),
                                 f"Encoding does not match for input {test}")
@@ -21,7 +21,7 @@ class TestBCH7_4(unittest.TestCase):
     def test_decoding(self):
         for bad_code, message in zip(self.bad_codes, self.messages):
             with self.subTest(bad_code=bad_code, message=message):
-                true_decoded_data = bch7_4.true_decode(bad_code)[0][:bch7_4.k].tolist()
+                true_decoded_data = bch7_4.validation_decode(bad_code)[0][:bch7_4.k].tolist()
                 decoded_data = bch7_4.decode(bad_code)[0][:bch7_4.k].tolist()
                 self.assertTrue(np.array_equal(decoded_data[:len(message)], message),
                                 f"Bad decoding for input {bad_code}")
