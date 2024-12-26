@@ -7,7 +7,23 @@ This project simulates BCH (Bose-Chaudhuri-Hocquenghem) error-correcting codes, 
 
 ## Setup Guide
 
-### **Option 1: Using Terminal**
+### **Option 1: Using an IDE(Recommended)**
+
+1. **Install Python**  
+   Ensure Python is installed on your system.
+
+2. **Open the Project in Your IDE**  
+   Open the `BCH_transcoder` folder as a project in your preferred IDE (such as PyCharm, VS Code, or any other).
+
+3. **Set Up Virtual Environment and Dependencies**  
+   - **For PyCharm**:
+     - You should be prompted to install the dependancies from the requirements.txt file. Press OK.
+     - If the method above didn't work, press Alt+F12 to open the integrated terminal. Run `pip install -r requirements.txt`.
+   - **For VS Code**:
+     - Use the `Python` extension and select the interpreter by clicking on the Python version in the status bar.
+     - Open the integrated terminal and run `pip install -r requirements.txt`, or use the IDE’s graphical package manager.
+
+### **Option 2: Using Terminal**
 
 1. **Install Python**  
    Ensure you have Python installed. You can download it from [python.org](https://www.python.org/).
@@ -31,22 +47,6 @@ This project simulates BCH (Bose-Chaudhuri-Hocquenghem) error-correcting codes, 
    # Install required libraries
    pip install -r requirements.txt
    ```
-
-### **Option 2: Using an IDE**
-
-1. **Install Python**  
-   Ensure Python is installed on your system.
-
-2. **Open the Project in Your IDE**  
-   Open the `BCH_transcoder` folder as a project in your preferred IDE (such as PyCharm, VS Code, or any other).
-
-3. **Set Up Virtual Environment and Dependencies**  
-   - **For PyCharm**:
-     - You should be prompted to install the dependancies from the requirements.txt file. Press OK.
-     - If the method above didn't work, press Alt+F12 to open the integrated terminal. Run `pip install -r requirements.txt`.
-   - **For VS Code**:
-     - Use the `Python` extension and select the interpreter by clicking on the Python version in the status bar.
-     - Open the integrated terminal and run `pip install -r requirements.txt`, or use the IDE’s graphical package manager.
 
 ---
 
