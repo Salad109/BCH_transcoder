@@ -35,10 +35,10 @@ if __name__ == "__main__":
 
     # Simulation parameters
     MAX_BER = 1.0  # Maximum bit error rate to test for(assuming it won't be terminated first by early stopping)
-    BER_STEP = 0.075  # BER step value
-    SAMPLE_SIZE = 150  # How many randomized messages to send per BER value
+    BER_STEP = 0.05  # BER step value
+    SAMPLE_SIZE = 250  # How many randomized messages to send per BER value
     PATIENCE = 3  # Stop after this many epochs' success rate is smaller or equal to threshold
-    THRESHOLD = 0.075 # Stop if success rate is smaller or equal to this value
+    THRESHOLD = 0.05 # Stop if success rate is smaller or equal to this value
 
     if MAX_BER <= 0 or BER_STEP <= 0 or SAMPLE_SIZE <= 0 or PATIENCE <= 0 or THRESHOLD < 0:
         raise ValueError("Simulation parameters must be positive.")

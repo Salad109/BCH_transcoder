@@ -65,7 +65,7 @@ def decode(codeword, generator, t):
         # print(f"Syndrome: {syndrome}, Hamming weight: {hamming_weight}")
 
         if hamming_weight <= t:
-            # Correction: add the syndrome to the current vector
+            # Add the syndrome to the current vector
             corrected_codeword = (codeword_poly + syndrome_poly).coeffs
             # Restore the original position only if there was a shift
             # Ensure corrected_codeword has the same length as codeword
