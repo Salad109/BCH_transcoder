@@ -12,10 +12,8 @@ venv.bak/
 
 # Generated results
 *.csv
-*.svg
 *.png
-results/
-plots/
+!demo_plots/*.png
 
 # IDE
 .vscode/
