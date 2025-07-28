@@ -51,7 +51,7 @@ various noise conditions, with comprehensive visualization tools for success rat
    ```
    *Note: This may take several minutes to complete*
 
-3. **Generate plots** (creates SVG visualizations):
+3. **Generate plots** (creates PNG visualizations):
    ```bash
    python plot_results.py
    ```
@@ -62,22 +62,22 @@ After running the simulation, the following plots are automatically generated:
 
 ### Success Rate vs Bit Error Rate (BER)
 
-![Success Rate for All BCH Codes](demo_plots/success_plot_all.svg)
+![Success Rate for All BCH Codes](demo_plots/success_plot_all.png)
 
 This plot shows how different BCH codes perform as the bit error rate increases. Higher success rates indicate better
 error correction capability.
 
 ### Effective Code Rate vs BER
 
-![Effective Code Rate for All BCH Codes](demo_plots/rate_plot_all.svg)
+![Effective Code Rate for All BCH Codes](demo_plots/rate_plot_all.png)
 
 The effective code rate represents actual data throughput, accounting for both the code rate (k/n) and the
 success rate at each BER level.
 
 ### BCH(15,x) Code Family Comparison
 
-![BCH(15,x) Success Rates](demo_plots/success_plot_bch15.svg)
-![BCH(15,x) Code Rates](demo_plots/rate_plot_bch15.svg)
+![BCH(15,x) Success Rates](demo_plots/success_plot_bch15.png)
+![BCH(15,x) Code Rates](demo_plots/rate_plot_bch15.png)
 
 These plots focus on the BCH(15,x) family, comparing codes with different error correction capabilities.
 
