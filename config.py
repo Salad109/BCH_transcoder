@@ -1,0 +1,6 @@
+# Simulation parameters
+MAX_BER = 0.7
+BER_STEP = 0.025
+SAMPLE_SIZE = 25
+PATIENCE = 3
+THRESHOLD = 0.01

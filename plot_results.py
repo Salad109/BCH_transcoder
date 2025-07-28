@@ -3,136 +3,112 @@ import matplotlib.pyplot as plt
 
 
 def read_csv(file_path):
-    with open(file_path, mode='r') as file:
+    with open(file_path, 'r') as file:
         reader = csv.reader(file)
-        headers = next(reader)  # Read the header row
+        headers = next(reader)
         data = list(reader)
     return headers, data
 
 
-# Read success rate data
+# Read data
 success_headers, success_data = read_csv('success_results.csv')
-BER_history = [float(row[0]) for row in success_data]
-bch127_8_success_history = [float(row[1]) for row in success_data]
-bch31_6_success_history = [float(row[2]) for row in success_data]
-bch15_5_success_history = [float(row[3]) for row in success_data]
-bch15_7_success_history = [float(row[4]) for row in success_data]
-bch15_11_success_history = [float(row[5]) for row in success_data]
-bch7_4_success_history = [float(row[6]) for row in success_data]
-baseline_15_success_history = [float(row[7]) for row in success_data]
-baseline_7_success_history = [float(row[8]) for row in success_data]
-
-# Read effective code rate data
 rate_headers, rate_data = read_csv('rate_results.csv')
+
+# Parse success data
+BER_history = [float(row[0]) for row in success_data]
+bch127_8_success = [float(row[1]) for row in success_data]
+bch31_6_success = [float(row[2]) for row in success_data]
+bch15_5_success = [float(row[3]) for row in success_data]
+bch15_7_success = [float(row[4]) for row in success_data]
+bch15_11_success = [float(row[5]) for row in success_data]
+bch7_4_success = [float(row[6]) for row in success_data]
+baseline_15_success = [float(row[7]) for row in success_data]
+baseline_7_success = [float(row[8]) for row in success_data]
+
+# Parse rate data
 bch127_8_rate = [float(row[1]) for row in rate_data]
 bch31_6_rate = [float(row[2]) for row in rate_data]
 bch15_5_rate = [float(row[3]) for row in rate_data]
 bch15_7_rate = [float(row[4]) for row in rate_data]
 bch15_11_rate = [float(row[5]) for row in rate_data]
-bch_7_4_rate = [float(row[6]) for row in rate_data]
+bch7_4_rate = [float(row[6]) for row in rate_data]
 baseline_15_rate = [float(row[7]) for row in rate_data]
 baseline_7_rate = [float(row[8]) for row in rate_data]
 
-# Plotting Success Rate vs BER
+# Plot 1: Success Rate vs BER (All codes)
 plt.figure(figsize=(10, 6))
-plt.plot(BER_history, bch127_8_success_history, color='purple', linestyle='-', linewidth=2,
-         label='BCH(127,8), t=31')
-plt.plot(BER_history, bch31_6_success_history, color='red', linestyle='-', linewidth=2,
-         label='BCH(31,6), t=7')
-plt.plot(BER_history, bch15_5_success_history, color='green', linestyle='-', linewidth=2,
-         label='BCH(15,5), t=3')
-plt.plot(BER_history, bch15_7_success_history, color='green', linestyle='--', linewidth=2,
-         label='BCH(15,7), t=2')
-plt.plot(BER_history, bch15_11_success_history, color='green', linestyle=':', linewidth=2,
-         label='BCH(15,11), t=1')
-plt.plot(BER_history, bch7_4_success_history, color='blue', linestyle='-', linewidth=2,
-         label='BCH(7,4), t=1')
-plt.plot(BER_history, baseline_15_success_history, color='black', linestyle='--', linewidth=2,
-         label='No encoding(k=15), t=0')
-plt.plot(BER_history, baseline_7_success_history, color='black', linestyle=':', linewidth=2,
-         label='No encoding(k=7), t=0')
+plt.plot(BER_history, bch127_8_success, 'purple', linewidth=2, label='BCH(127,8), t=31')
+plt.plot(BER_history, bch31_6_success, 'red', linewidth=2, label='BCH(31,6), t=7')
+plt.plot(BER_history, bch15_5_success, 'green', linewidth=2, label='BCH(15,5), t=3')
+plt.plot(BER_history, bch15_7_success, 'green', linestyle='--', linewidth=2, label='BCH(15,7), t=2')
+plt.plot(BER_history, bch15_11_success, 'green', linestyle=':', linewidth=2, label='BCH(15,11), t=1')
+plt.plot(BER_history, bch7_4_success, 'blue', linewidth=2, label='BCH(7,4), t=1')
+plt.plot(BER_history, baseline_15_success, 'black', linestyle='--', linewidth=2, label='No encoding(k=15)')
+plt.plot(BER_history, baseline_7_success, 'black', linestyle=':', linewidth=2, label='No encoding(k=7)')
 
 plt.title("Success Rate vs. BER for various BCH Codes", fontsize=20, fontweight='bold')
 plt.xlabel("Bit Error Rate (BER)", fontsize=12)
 plt.ylabel("Success Rate", fontsize=12)
-plt.grid(True, linestyle='--', linewidth=0.5)
-plt.legend(loc="upper right", prop={'size': 15})
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.legend(loc="upper right", fontsize=10)
 plt.tight_layout()
-
 plt.savefig('success_plot_all.svg', format='svg')
-print("Success plot saved as success_plot_all.svg")
+print("Saved: success_plot_all.svg")
 plt.show()
 
-# Plotting code rate
+# Plot 2: Code Rate vs BER (All codes)
 plt.figure(figsize=(10, 6))
-plt.plot(BER_history, bch127_8_rate, color='purple', linestyle='-', linewidth=2,
-         label='BCH(127,8), t=31')
-plt.plot(BER_history, bch31_6_rate, color='red', linestyle='-', linewidth=2,
-         label='BCH(31,6), t=7')
-plt.plot(BER_history, bch15_5_rate, color='green', linestyle='-', linewidth=2,
-         label='BCH(15,5), t=3')
-plt.plot(BER_history, bch15_7_rate, color='green', linestyle='--', linewidth=2,
-         label='BCH(15,7), t=2')
-plt.plot(BER_history, bch15_11_rate, color='green', linestyle=':', linewidth=2,
-         label='BCH(15,11), t=1')
-plt.plot(BER_history, bch_7_4_rate, color='blue', linestyle='-', linewidth=2,
-         label='BCH(7,4), t=1')
-plt.plot(BER_history, baseline_15_rate, color='black', linestyle='--', linewidth=2,
-         label='No encoding(k=15), t=0')
-plt.plot(BER_history, baseline_7_rate, color='black', linestyle=':', linewidth=2,
-         label='No encoding(k=7), t=0')
+plt.plot(BER_history, bch127_8_rate, 'purple', linewidth=2, label='BCH(127,8), t=31')
+plt.plot(BER_history, bch31_6_rate, 'red', linewidth=2, label='BCH(31,6), t=7')
+plt.plot(BER_history, bch15_5_rate, 'green', linewidth=2, label='BCH(15,5), t=3')
+plt.plot(BER_history, bch15_7_rate, 'green', linestyle='--', linewidth=2, label='BCH(15,7), t=2')
+plt.plot(BER_history, bch15_11_rate, 'green', linestyle=':', linewidth=2, label='BCH(15,11), t=1')
+plt.plot(BER_history, bch7_4_rate, 'blue', linewidth=2, label='BCH(7,4), t=1')
+plt.plot(BER_history, baseline_15_rate, 'black', linestyle='--', linewidth=2, label='No encoding(k=15)')
+plt.plot(BER_history, baseline_7_rate, 'black', linestyle=':', linewidth=2, label='No encoding(k=7)')
 
-plt.title("Effective code rate vs. BER for various BCH Codes", fontsize=20, fontweight='bold')
+plt.title("Effective Code Rate vs. BER for various BCH Codes", fontsize=20, fontweight='bold')
 plt.xlabel("Bit Error Rate (BER)", fontsize=12)
-plt.ylabel("Effective code rate", fontsize=12)
-plt.grid(True, linestyle='--', linewidth=0.5)
-plt.legend(loc="upper right", prop={'size': 15})
+plt.ylabel("Effective Code Rate", fontsize=12)
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.legend(loc="upper right", fontsize=10)
 plt.tight_layout()
-
 plt.savefig('rate_plot_all.svg', format='svg')
-print("Rate plot saved as rate_plot_all.svg")
+print("Saved: rate_plot_all.svg")
 plt.show()
 
-# Plotting BCH(15,x) success rates standalone
+# Plot 3: BCH(15,x) Success Rates
 plt.figure(figsize=(10, 6))
-plt.plot(BER_history, bch15_5_success_history, color='green', linestyle='-', linewidth=2,
-         label='BCH(15,5), t=3')
-plt.plot(BER_history, bch15_7_success_history, color='green', linestyle='--', linewidth=2,
-         label='BCH(15,7), t=2')
-plt.plot(BER_history, bch15_11_success_history, color='green', linestyle=':', linewidth=2,
-         label='BCH(15,11), t=1')
-plt.plot(BER_history, baseline_15_success_history, color='black', linestyle='--', linewidth=2,
-         label='No encoding(k=15), t=0')
+plt.plot(BER_history, bch15_5_success, 'green', linewidth=2, label='BCH(15,5), t=3')
+plt.plot(BER_history, bch15_7_success, 'green', linestyle='--', linewidth=2, label='BCH(15,7), t=2')
+plt.plot(BER_history, bch15_11_success, 'green', linestyle=':', linewidth=2, label='BCH(15,11), t=1')
+plt.plot(BER_history, baseline_15_success, 'black', linestyle='--', linewidth=2, label='No encoding(k=15)')
 
 plt.title("Success Rate vs. BER for BCH(15,x) codes", fontsize=20, fontweight='bold')
 plt.xlabel("Bit Error Rate (BER)", fontsize=12)
 plt.ylabel("Success Rate", fontsize=12)
-plt.grid(True, linestyle='--', linewidth=0.5)
-plt.legend(loc="upper right", prop={'size': 15})
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.legend(loc="upper right", fontsize=12)
 plt.tight_layout()
-
 plt.savefig('success_plot_bch15.svg', format='svg')
-print("Success plot saved as success_plot_bch15.svg")
+print("Saved: success_plot_bch15.svg")
 plt.show()
 
-# Plotting BCH(15,x) code rate standalone
+# Plot 4: BCH(15,x) Code Rates
 plt.figure(figsize=(10, 6))
-plt.plot(BER_history, bch15_5_rate, color='green', linestyle='-', linewidth=2,
-         label='BCH(15,5), t=3')
-plt.plot(BER_history, bch15_7_rate, color='green', linestyle='--', linewidth=2,
-         label='BCH(15,7), t=2')
-plt.plot(BER_history, bch15_11_rate, color='green', linestyle=':', linewidth=2,
-         label='BCH(15,11), t=1')
-plt.plot(BER_history, baseline_15_rate, color='black', linestyle='--', linewidth=2,
-         label='No encoding(k=15), t=0')
+plt.plot(BER_history, bch15_5_rate, 'green', linewidth=2, label='BCH(15,5), t=3')
+plt.plot(BER_history, bch15_7_rate, 'green', linestyle='--', linewidth=2, label='BCH(15,7), t=2')
+plt.plot(BER_history, bch15_11_rate, 'green', linestyle=':', linewidth=2, label='BCH(15,11), t=1')
+plt.plot(BER_history, baseline_15_rate, 'black', linestyle='--', linewidth=2, label='No encoding(k=15)')
 
-plt.title("Effective code rate vs. BER for BCH(15,x) codes", fontsize=20, fontweight='bold')
+plt.title("Effective Code Rate vs. BER for BCH(15,x) codes", fontsize=20, fontweight='bold')
 plt.xlabel("Bit Error Rate (BER)", fontsize=12)
-plt.ylabel("Effective code rate", fontsize=12)
-plt.grid(True, linestyle='--', linewidth=0.5)
-plt.legend(loc="upper right", prop={'size': 15})
+plt.ylabel("Effective Code Rate", fontsize=12)
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.legend(loc="upper right", fontsize=12)
 plt.tight_layout()
-
 plt.savefig('rate_plot_bch15.svg', format='svg')
-print("Rate plot saved as rate_plot_bch15.svg")
+print("Saved: rate_plot_bch15.svg")
 plt.show()
+
+print("All plots generated successfully!")

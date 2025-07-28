@@ -1,6 +1,7 @@
 import galois
 import numpy as np
 import pyinputplus as pyip
+
 from transmission_simulation import flip_random_bits, introduce_error
 
 
